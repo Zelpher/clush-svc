@@ -1,0 +1,10 @@
+clush-svc tries to simplify system services management in Linux clusters. It
+uses ClusterShell's API and mimicks clush.
+Planned features:
+ * start/stop/restart/status of any service across cluster nodes
+ * definition of services groups and dependances
+ * GUI
+
+Authors: Franck Nguyen, Alexandre Sicard
+This project is part of our Cluster and Grid Computing class with Patrice Lucas
+at Université d'Évry.
