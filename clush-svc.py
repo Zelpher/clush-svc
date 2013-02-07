@@ -13,7 +13,7 @@ Config = {}
 
 class Node:
     name = None
-    manager = 'sysvinit'
+    manager = 'service'
 
     def __init__(self, name=None):
         self.name = name
