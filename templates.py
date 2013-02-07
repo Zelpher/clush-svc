@@ -1,24 +1,24 @@
 managers = {
-    'bsdinit': {
-        'base': '/etc/rc.d/',
-        'start': "%s start",
-        'stop': "%s stop",
-        'restart': "%s status",
-        'status': "%s status",
-    },
-    'systemd': {
-        'base': 'systemctl ',
-        'start': "%s.service start",
-        'stop': "%s.service stop",
-        'restart': "%s.service status",
-        'status': "%s.service status",
-    },
     'sysvinit': {
         'base': '/etc/init.d/',
         'start': "%s start",
         'stop': "%s stop",
-        'restart': "%s status",
+        'restart': "%s restart",
         'status': "%s status",
+    },
+    'bsdinit': {
+        'base': '/etc/rc.d/',
+        'start': "%s start",
+        'stop': "%s stop",
+        'restart': "%s restart",
+        'status': "%s status",
+    },
+    'systemd': {
+        'base': 'systemctl ',
+        'start': "start %s.service",
+        'stop': "stop %s.service",
+        'restart': "restart %s.service",
+        'status': "status %s.service",
     }
 }
 
