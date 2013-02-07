@@ -9,7 +9,12 @@ import ClusterShell.NodeSet as NodeSet
 
 import templates
 
-Config = {}
+Config = {
+    'nodes': {},
+    'services': {},
+    'dependencies': {},
+    'groups': {}
+}
 
 class Node:
     name = None
@@ -18,11 +23,12 @@ class Node:
     def __init__(self, name=None):
         self.name = name
 
-def config_read_nodes():
+
+def config_read():
     """
-    Load nodes from config files into Config['nodes']
+    Load nodes from config files into Config
     """
-    Config['nodes'] = {}
+    # { nodeName: <Node object>, ... }
     conf = ConfigParser()
     conf.read(['/etc/clush-svc/nodes.cfg',
         os.path.expanduser('~/.config/clush-svc/nodes.cfg')])
@@ -39,7 +45,8 @@ def parse_nodes(nodeset):
     """
     nodes = []
     for node in NodeSet.NodeSet(nodeset):
-        nodes.append(Config['nodes'][node] if node in Config['nodes'] else Node(node))
+        nodes.append(Config['nodes'][node] if node in Config['nodes']
+                else Node(node))
     return nodes
 
 def group_nodes(nodes):
@@ -61,7 +68,7 @@ def main():
     (options, args) = parser.parse_args()
 
     # Read config
-    config_read_nodes()
+    config_read()
 
     # Prepare and launch tasks
     groupedNodes = group_nodes(parse_nodes(options.nodes))
