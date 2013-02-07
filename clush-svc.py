@@ -39,6 +39,37 @@ def config_read():
             Config['nodes'][node].name = node
             Config['nodes'][node].manager = manager
 
+    # { serviceName: { <NodeSet object>: script }, ... }
+    conf = ConfigParser()
+    conf.read(['/etc/clush-svc/services.cfg',
+        os.path.expanduser('~/.config/clush-svc/services.cfg')])
+    for service in conf.sections():
+        Config['services'][service] = {}
+        for (nodeset, script) in conf.items(service):
+            nodeset = NodeSet.NodeSet(nodeset)
+            Config['services'][service][nodeset] = script
+
+    # { serviceName: { <NodeSet object>: [dependency1, ...], ... }, ... }
+    conf = ConfigParser()
+    conf.read(['/etc/clush-svc/dependencies.cfg',
+        os.path.expanduser('~/.config/clush-svc/dependencies.cfg')])
+    for service in conf.sections():
+        Config['dependencies'][service] = {}
+        for (nodeset, dependencies) in conf.items(service):
+            dependencies = map(str.strip, dependencies.split(','))
+            nodeset = NodeSet.NodeSet(nodeset)
+            Config['dependencies'][service][nodeset] = dependencies
+
+    # { groupName: { serviceName: <NodeSet object>, ...  }, ... }
+    conf = ConfigParser()
+    conf.read(['/etc/clush-svc/groups.cfg',
+        os.path.expanduser('~/.config/clush-svc/groups.cfg')])
+    for group in conf.sections():
+        Config['groups'][group] = {}
+        for (service, nodeset) in conf.items(group):
+            nodeset = NodeSet.NodeSet(nodeset)
+            Config['groups'][group][service] = nodeset
+
 def parse_nodes(nodeset):
     """
     Take a string NodeSet and return a list of Nodes
