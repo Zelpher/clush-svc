@@ -100,16 +100,43 @@ def main():
 
     # Read config
     config_read()
+    # parse_nodes needs config
+    arg_nodes = parse_nodes(options.nodes)
+    arg_service = args[0]
+
+    # Make groups of nodes by script name for requested service
+    nodesByDeamon = {} # { 'deamon_name': [node1, node2, ...], ... }
+    deamonByNodes = [] # [([node1, node2, ...], deamon_name), ...]
+    for target_node in arg_nodes:
+        nodeInConfig = False
+        if arg_service in Config['services']:
+            for daemon_nodeset in Config['services'][arg_service]:
+                if target_node.name in daemon_nodeset:
+                    daemonName = Config['services'][arg_service][daemon_nodeset]
+                    if daemonName not in nodesByDeamon.keys():
+                        nodesByDeamon[daemonName] = []
+                    nodesByDeamon[daemonName].append(target_node)
+                    nodeInConfig = True
+        if not nodeInConfig:
+            if arg_service not in nodesByDeamon.keys():
+                nodesByDeamon[arg_service] = []
+            nodesByDeamon[arg_service].append(target_node)
+    for daemon in nodesByDeamon:
+        deamonByNodes.append((nodesByDeamon[daemon], daemon))
+    del nodesByDeamon
 
     # Prepare and launch tasks
-    groupedNodes = group_nodes(parse_nodes(options.nodes))
     tasks = []
-    for manager in groupedNodes:
-        task = Task.task_self()
-        nodesList = ','.join([node.name for node in groupedNodes[manager]])
-        task.run(templates.get_command(manager=manager, service=args[0],
-            action=args[1]), nodes=nodesList)
-        tasks.append(task)
+    for deamon in deamonByNodes:
+        groupedNodes = group_nodes(deamon[0])
+        for manager in groupedNodes:
+            task = Task.task_self()
+            nodesList = ','.join([node.name for node in groupedNodes[manager]])
+            command = templates.get_command(manager=manager, service=deamon[1],
+                action=args[1])
+            print "Task run: " + command + ", nodes: " + nodesList
+            task.run(command, nodes=nodesList)
+            tasks.append(task)
 
     for task in tasks:
         for (rc, keys) in task.iter_retcodes():
