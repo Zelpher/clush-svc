@@ -17,11 +17,9 @@ Config = {
 }
 
 class Node:
-    name = None
-    manager = 'service'
-
-    def __init__(self, name=None):
+    def __init__(self, name=None, manager='service'):
         self.name = name
+        self.manager = manager
 
 
 def config_read():
