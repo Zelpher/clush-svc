@@ -24,7 +24,8 @@ def config_read_nodes():
     """
     Config['nodes'] = {}
     conf = ConfigParser()
-    conf.read(['/etc/clush-svc/nodes.cfg', os.path.expanduser('~/.config/nodes.cfg')])
+    conf.read(['/etc/clush-svc/nodes.cfg',
+        os.path.expanduser('~/.config/clush-svc/nodes.cfg')])
     for (nodes, manager) in conf.items('Managers'):
         for node in NodeSet.NodeSet(nodes):
             if node not in Config['nodes']:
