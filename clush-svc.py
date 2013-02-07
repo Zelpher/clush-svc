@@ -103,34 +103,34 @@ def main():
     arg_service = args[0]
 
     # Make groups of nodes by script name for requested service
-    nodesByDeamon = {} # { 'deamon_name': [node1, node2, ...], ... }
-    deamonByNodes = [] # [([node1, node2, ...], deamon_name), ...]
+    nodesByScript = {} # { 'script_name': [node1, node2, ...], ... }
+    scriptByNodes = [] # [([node1, node2, ...], script_name), ...]
     for target_node in arg_nodes:
         nodeInConfig = False
         if arg_service in Config['services']:
-            for daemon_nodeset in Config['services'][arg_service]:
-                if target_node.name in daemon_nodeset:
-                    daemonName = Config['services'][arg_service][daemon_nodeset]
-                    if daemonName not in nodesByDeamon.keys():
-                        nodesByDeamon[daemonName] = []
-                    nodesByDeamon[daemonName].append(target_node)
+            for script_nodeset in Config['services'][arg_service]:
+                if target_node.name in script_nodeset:
+                    scriptName = Config['services'][arg_service][script_nodeset]
+                    if scriptName not in nodesByScript.keys():
+                        nodesByScript[scriptName] = []
+                    nodesByScript[scriptName].append(target_node)
                     nodeInConfig = True
         if not nodeInConfig:
-            if arg_service not in nodesByDeamon.keys():
-                nodesByDeamon[arg_service] = []
-            nodesByDeamon[arg_service].append(target_node)
-    for daemon in nodesByDeamon:
-        deamonByNodes.append((nodesByDeamon[daemon], daemon))
-    del nodesByDeamon
+            if arg_service not in nodesByScript.keys():
+                nodesByScript[arg_service] = []
+            nodesByScript[arg_service].append(target_node)
+    for script in nodesByScript:
+        scriptByNodes.append((nodesByScript[script], script))
+    del nodesByScript
 
     # Prepare and launch tasks
     tasks = []
-    for deamon in deamonByNodes:
-        groupedNodes = group_nodes(deamon[0])
+    for script in scriptByNodes:
+        groupedNodes = group_nodes(script[0])
         for manager in groupedNodes:
             task = Task.task_self()
             nodesList = ','.join([node.name for node in groupedNodes[manager]])
-            command = templates.get_command(manager=manager, service=deamon[1],
+            command = templates.get_command(manager=manager, service=script[1],
                 action=args[1])
             print "Task run: " + command + ", nodes: " + nodesList
             task.run(command, nodes=nodesList)
