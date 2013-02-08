@@ -21,6 +21,13 @@ class Node:
         self.name = name
         self.manager = manager
 
+class InfiniteRecursionError(Exception):
+    def __init__(self, service, node):
+        self.service = service
+        self.node = node
+    def __str__(self):
+        return "Service %s on node %s" %(self.service, self.node.name)
+
 
 def config_read():
     """
@@ -78,7 +85,7 @@ def parse_nodes(nodeset):
                 else Node(node))
     return nodes
 
-def group_nodes(nodes):
+def group_nodes_by_manager(nodes):
     """
     Take a list of Nodes and group them by manager. Return a dict with
     service manager as key and Nodes as values.
@@ -89,6 +96,77 @@ def group_nodes(nodes):
             groupedNodes[node.manager] = []
         groupedNodes[node.manager].append(node)
     return groupedNodes
+
+def get_dependencies(arg_dependencies):
+    """
+    Take and return a dict { 'service': set(<Node object>, ...), ... }
+    """
+    dependencies = {}
+    for arg_service in arg_dependencies:
+        if arg_service in Config['dependencies']:
+            for target_node in arg_dependencies[arg_service]:
+                for dep_nodes in Config['dependencies'][arg_service]:
+                    if target_node.name in dep_nodes:
+                        dep_services = Config['dependencies'][arg_service][dep_nodes]
+                        for dep_service in dep_services:
+                            if dep_service not in dependencies:
+                                dependencies[dep_service] = set()
+                            dependencies[dep_service].add(target_node)
+    return dependencies
+
+def get_all_dependencies(arg_service, arg_nodes):
+    """
+    Recursive get_dependencies. Return a list of dicts like get_dependencies
+    """
+    all_dependencies = []
+    dependencies = get_dependencies({arg_service: arg_nodes})
+    while dependencies:
+        for service in dependencies:
+            for node in dependencies[service]:
+                for dependency in all_dependencies:
+                    if service in dependency:
+                        if node in dependency[service]:
+                            raise InfiniteRecursionError(service, node)
+        all_dependencies.append(dependencies)
+        dependencies = get_dependencies(dependencies)
+    return all_dependencies
+
+def group_nodes_by_script(service, nodes):
+    """
+    Make groups of nodes by script name for requested service
+    """
+    nodesByScript = {} # { 'script_name': [node1, node2, ...], ... }
+    for target_node in nodes:
+        nodeInConfig = False
+        if service in Config['services']:
+            for script_nodeset in Config['services'][service]:
+                if target_node.name in script_nodeset:
+                    scriptName = Config['services'][service][script_nodeset]
+                    if scriptName not in nodesByScript.keys():
+                        nodesByScript[scriptName] = []
+                    nodesByScript[scriptName].append(target_node)
+                    nodeInConfig = True
+        if not nodeInConfig:
+            if service not in nodesByScript.keys():
+                nodesByScript[service] = []
+            nodesByScript[service].append(target_node)
+    return nodesByScript
+
+def tasks_run(arg_tasks, action):
+    """
+    Prepare and launch tasks
+    """
+    tasks = []
+    for script in arg_tasks:
+        groupedNodes = group_nodes_by_manager(arg_tasks[script])
+        for manager in groupedNodes:
+            task = Task.task_self()
+            nodesList = ','.join([node.name for node in groupedNodes[manager]])
+            command = templates.get_command(manager=manager, service=script,
+                action=action)
+            print "Task run: " + command + ", nodes: " + nodesList
+            #task.run(command, nodes=nodesList)
+            tasks.append(task)
 
 def main():
     # Parse command line options
@@ -102,43 +180,21 @@ def main():
     arg_nodes = parse_nodes(options.nodes)
     arg_service = args[0]
 
-    # Make groups of nodes by script name for requested service
-    nodesByScript = {} # { 'script_name': [node1, node2, ...], ... }
-    scriptByNodes = [] # [([node1, node2, ...], script_name), ...]
-    for target_node in arg_nodes:
-        nodeInConfig = False
-        if arg_service in Config['services']:
-            for script_nodeset in Config['services'][arg_service]:
-                if target_node.name in script_nodeset:
-                    scriptName = Config['services'][arg_service][script_nodeset]
-                    if scriptName not in nodesByScript.keys():
-                        nodesByScript[scriptName] = []
-                    nodesByScript[scriptName].append(target_node)
-                    nodeInConfig = True
-        if not nodeInConfig:
-            if arg_service not in nodesByScript.keys():
-                nodesByScript[arg_service] = []
-            nodesByScript[arg_service].append(target_node)
-    for script in nodesByScript:
-        scriptByNodes.append((nodesByScript[script], script))
-    del nodesByScript
+    all_dependencies = get_all_dependencies(arg_service, arg_nodes)
+    all_dependencies.reverse()
+    for dependencies_group in all_dependencies:
+        tasks = {}
+        for dependency in dependencies_group:
+            tasks.update(group_nodes_by_script(dependency, 
+                                            dependencies_group[dependency]))
+        tasks = tasks_run(tasks, args[1])
+        print "--------------------------"
+        # Verifier les codes de retour
+    # Lancer les taches principales
 
-    # Prepare and launch tasks
-    tasks = []
-    for script in scriptByNodes:
-        groupedNodes = group_nodes(script[0])
-        for manager in groupedNodes:
-            task = Task.task_self()
-            nodesList = ','.join([node.name for node in groupedNodes[manager]])
-            command = templates.get_command(manager=manager, service=script[1],
-                action=args[1])
-            print "Task run: " + command + ", nodes: " + nodesList
-            task.run(command, nodes=nodesList)
-            tasks.append(task)
-
-    for task in tasks:
-        for (rc, keys) in task.iter_retcodes():
-            print NodeSet.NodeSet.fromlist(keys), str(rc)
+#    for task in tasks:
+#        for (rc, keys) in task.iter_retcodes():
+#            print NodeSet.NodeSet.fromlist(keys), str(rc)
 
 if __name__ == '__main__':
     main()
