@@ -1,10 +1,10 @@
 managers = {
     'service': {
         'base': 'service ',
-        'start': "start %s",
-        'stop': "stop %s",
-        'restart': "restart %s",
-        'status': "status %s",
+        'start': "%s start ",
+        'stop': "%s stop ",
+        'restart': "%s restart ",
+        'status': "%s status ",
     },
     'sysvinit': {
         'base': '/etc/init.d/',
