@@ -7,7 +7,7 @@ import os
 import ClusterShell.Task as Task
 import ClusterShell.NodeSet as NodeSet
 
-import templates
+import managers
 
 Config = {
     'nodes': {},
@@ -162,7 +162,7 @@ def tasks_run(arg_tasks, action):
         for manager in groupedNodes:
             task = Task.task_self()
             nodesList = ','.join([node.name for node in groupedNodes[manager]])
-            command = templates.get_command(manager=manager, service=script,
+            command = managers.get_command(manager=manager, service=script,
                 action=action)
             print "Task run: " + command + ", nodes: " + nodesList
             #task.run(command, nodes=nodesList)
