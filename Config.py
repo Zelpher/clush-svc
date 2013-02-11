@@ -116,7 +116,7 @@ class Config:
             """
             Recursively get all dependencies for a given service on a given
             node. Return a list of dependencies groups, from the independent
-            ones to the most dependent one.
+            one to the most dependent one.
             [ { 'service': set(<Node object>, ...), ... }, ... ]
             """
             all_dependencies = []
