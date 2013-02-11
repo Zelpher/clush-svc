@@ -46,7 +46,8 @@ def main():
     # Read config
     config = Config.Config()
     # parse_nodes needs config
-    arg_nodes = config.nodes.get_from_nodeset(NodeSet.NodeSet(options.nodes))
+    arg_nodes = config.nodes.get_from_nodeset(
+            NodeSet.NodeSet(options.nodes.lower()))
     arg_service = args[0]
     arg_action = args[1]
 

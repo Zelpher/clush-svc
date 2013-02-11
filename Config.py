@@ -21,6 +21,7 @@ class Config:
                 os.path.expanduser('~/.config/clush-svc/nodes.cfg')])
             for (nodes, manager) in conf.items('Managers'):
                 for node in NodeSet.NodeSet(nodes):
+                    node = node.lower()
                     if node not in self.nodes:
                         self.nodes[node] = Node.Node()
                     self.nodes[node].name = node
@@ -50,7 +51,7 @@ class Config:
             for service in conf.sections():
                 self.services[service] = {}
                 for (nodeset, script) in conf.items(service):
-                    nodeset = NodeSet.NodeSet(nodeset)
+                    nodeset = NodeSet.NodeSet(nodeset.lower())
                     self.services[service][nodeset] = script
 
         def get_alias(self, service, node):
@@ -81,7 +82,7 @@ class Config:
                 self.dependencies[service] = {}
                 for (nodeset, dependencies) in conf.items(service):
                     dependencies = map(str.strip, dependencies.split(','))
-                    nodeset = NodeSet.NodeSet(nodeset)
+                    nodeset = NodeSet.NodeSet(nodeset.lower())
                     self.dependencies[service][nodeset] = dependencies
 
         def get_for_one(self, service, node):
@@ -150,7 +151,7 @@ class Config:
             for group in conf.sections():
                 self.groups[group] = {}
                 for (service, nodeset) in conf.items(group):
-                    nodeset = NodeSet.NodeSet(nodeset)
+                    nodeset = NodeSet.NodeSet(nodeset.lower())
                     self.groups[group][service] = nodeset
 
         def group_get(self, group):
