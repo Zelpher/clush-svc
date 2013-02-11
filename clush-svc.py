@@ -67,6 +67,11 @@ def dependencies_run(config, dependencies, action):
         print "=========================="
 
 def main():
+    arg_nodes = None
+    arg_group = None
+    arg_service = None
+    arg_action = None
+
     # Parse command line options
     parser = OptionParser()
     parser.add_option("-w", dest="nodes")
@@ -74,19 +79,29 @@ def main():
 
     # Read config
     config = Config.Config()
-    # parse_nodes needs config
-    arg_nodes = config.nodes.get_from_nodeset(
-            NodeSet.NodeSet(options.nodes.lower()))
-    arg_service = args[0]
-    arg_action = args[1]
+
+    # are we using groups?
+    if (not options.nodes):
+        arg_group = args[0]
+        arg_action = args[1]
+        arg_task = config.groups.get(arg_group.lower())
+        for service in arg_task:
+            arg_task[service] = set(config.nodes.get_from_nodeset(
+                arg_task[service]))
+    else:
+        arg_nodes = config.nodes.get_from_nodeset(NodeSet.NodeSet(
+            options.nodes.lower()))
+        arg_service = args[0]
+        arg_action = args[1]
+        arg_task = {arg_service: set(arg_nodes)}
 
     # Do we check dependencies too?
     if arg_action in ('start', 'status'): # if arg_action not in ('stop', 'restart')
-        dependencies = config.dependencies.get_recursive(arg_service, arg_nodes)
-        dependencies.append({arg_service: set(arg_nodes)})
+        dependencies = config.dependencies.get_recursive(arg_task)
+        dependencies.append(arg_task)
         dependencies_run(config, dependencies, arg_action)
     else:
-        dependencies = [{arg_service: set(arg_nodes)}]
+        dependencies = [arg_task]
         dependencies_run(config, dependencies, arg_action)
 
 if __name__ == '__main__':

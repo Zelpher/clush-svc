@@ -113,15 +113,15 @@ class Config:
                         dependencies[dep_service].add(node)
             return dependencies
 
-        def get_recursive(self, arg_service, arg_nodes):
+        def get_recursive(self, arg_services):
             """
-            Recursively get all dependencies for a given service on a given
-            node. Return a list of dependencies groups, from the independent
-            one to the most dependent one.
+            Recursively get all dependencies for a given set of services on a
+            given node. Return a list of dependencies groups, from the
+            independent one to the most dependent one.
             [ { 'service': set(<Node object>, ...), ... }, ... ]
             """
             all_dependencies = []
-            dependencies = self.get_for_many({arg_service: arg_nodes})
+            dependencies = self.get_for_many(arg_services)
             while dependencies:
                 # check for circular dependencies
                 for service in dependencies:
@@ -149,17 +149,18 @@ class Config:
             conf.read(['/etc/clush-svc/groups.cfg',
                 os.path.expanduser('~/.config/clush-svc/groups.cfg')])
             for group in conf.sections():
+                group = group.lower()
                 self.groups[group] = {}
                 for (service, nodeset) in conf.items(group):
                     nodeset = NodeSet.NodeSet(nodeset.lower())
                     self.groups[group][service] = nodeset
 
-        def group_get(self, group):
+        def get(self, group):
             """
             Return the services and associated NodeSets of a given group by its name.
             { serviceName: <NodeSet object>, ... }
             """
-            return [self.groups[group] if group in self.groups else {}]
+            return self.groups[group] if group in self.groups else {}
     ##########
 
     def __init__(self):
