@@ -12,35 +12,29 @@
       <column type="gchararray"/>
     </columns>
   </object>
-  <object class="GtkListStore" id="dependencies_edge_liststore">
-    <columns>
-      <!-- column-name Nodes -->
-      <column type="gchararray"/>
-    </columns>
-  </object>
-  <object class="GtkListStore" id="dependencies_left_liststore">
-    <columns>
-      <!-- column-name Services -->
-      <column type="gchararray"/>
-    </columns>
-  </object>
-  <object class="GtkListStore" id="dependencies_right_liststore">
+  <object class="GtkListStore" id="dependencies_dependencies_liststore">
     <columns>
       <!-- column-name Dependencies -->
       <column type="gchararray"/>
     </columns>
   </object>
-  <object class="GtkListStore" id="groups_left_liststore">
+  <object class="GtkListStore" id="dependencies_nodeset_liststore">
     <columns>
-      <!-- column-name Groups -->
+      <!-- column-name Nodes -->
       <column type="gchararray"/>
     </columns>
   </object>
-  <object class="GtkListStore" id="groups_right_liststore">
+  <object class="GtkListStore" id="dependencies_service_liststore">
     <columns>
       <!-- column-name Services -->
       <column type="gchararray"/>
-      <!-- column-name Nodes -->
+    </columns>
+  </object>
+  <object class="GtkListStore" id="group_liststore">
+    <columns>
+      <!-- column-name Service -->
+      <column type="gchararray"/>
+      <!-- column-name NodeSet -->
       <column type="gchararray"/>
     </columns>
   </object>
@@ -50,9 +44,22 @@
       <column type="gchararray"/>
     </columns>
   </object>
+  <object class="GtkListStore" id="nodes_liststore">
+    <columns>
+      <!-- column-name NodeSet -->
+      <column type="gchararray"/>
+    </columns>
+  </object>
+  <object class="GtkListStore" id="groups_liststore">
+    <columns>
+      <!-- column-name Groups -->
+      <column type="gchararray"/>
+    </columns>
+  </object>
   <object class="GtkWindow" id="main_window">
     <property name="visible">True</property>
     <property name="can_focus">False</property>
+    <property name="border_width">5</property>
     <property name="title" translatable="yes">Clush-SVC GUI</property>
     <property name="default_height">300</property>
     <signal name="destroy" handler="on_main_window_destroy" swapped="no"/>
@@ -78,7 +85,7 @@
           </packing>
         </child>
         <child>
-          <object class="GtkTable" id="command_tab">
+          <object class="GtkTable" id="command_table">
             <property name="visible">True</property>
             <property name="can_focus">False</property>
             <property name="border_width">5</property>
@@ -86,23 +93,23 @@
             <property name="column_spacing">5</property>
             <property name="row_spacing">5</property>
             <child>
-              <object class="GtkAspectFrame" id="command_entry_aspectframe">
+              <object class="GtkAspectFrame" id="command_aspectframe">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <property name="label_xalign">0</property>
                 <property name="shadow_type">none</property>
                 <child>
-                  <object class="GtkHBox" id="command_entry_hbox">
+                  <object class="GtkHBox" id="command_hbox">
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
                     <child>
-                      <object class="GtkFrame" id="command_entry_target_frame">
+                      <object class="GtkFrame" id="command_target_frame">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
                         <property name="label_xalign">0</property>
                         <property name="shadow_type">none</property>
                         <child>
-                          <object class="GtkEntry" id="command_entry_target_area">
+                          <object class="GtkEntry" id="command_target_entry">
                             <property name="visible">True</property>
                             <property name="can_focus">True</property>
                             <property name="invisible_char">•</property>
@@ -115,7 +122,7 @@
                           </object>
                         </child>
                         <child type="label">
-                          <object class="GtkLabel" id="command_entry_target_label">
+                          <object class="GtkLabel" id="command_target_label">
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
                             <property name="label" translatable="yes">&lt;b&gt;Target&lt;/b&gt;</property>
@@ -130,13 +137,13 @@
                       </packing>
                     </child>
                     <child>
-                      <object class="GtkFrame" id="command_entry_service_frame">
+                      <object class="GtkFrame" id="command_service_frame">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
                         <property name="label_xalign">0</property>
                         <property name="shadow_type">none</property>
                         <child>
-                          <object class="GtkEntry" id="command_entry_service_area">
+                          <object class="GtkEntry" id="command_service_entry">
                             <property name="visible">True</property>
                             <property name="can_focus">True</property>
                             <property name="invisible_char">•</property>
@@ -149,7 +156,7 @@
                           </object>
                         </child>
                         <child type="label">
-                          <object class="GtkLabel" id="command_entry_service_label">
+                          <object class="GtkLabel" id="command_service_label">
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
                             <property name="label" translatable="yes">&lt;b&gt;Service&lt;/b&gt;</property>
@@ -164,13 +171,13 @@
                       </packing>
                     </child>
                     <child>
-                      <object class="GtkFrame" id="command_entry_action_frame">
+                      <object class="GtkFrame" id="command_action_frame">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
                         <property name="label_xalign">0</property>
                         <property name="shadow_type">none</property>
                         <child>
-                          <object class="GtkEntry" id="command_entry_action_area">
+                          <object class="GtkEntry" id="command_action_entry">
                             <property name="visible">True</property>
                             <property name="can_focus">True</property>
                             <property name="invisible_char">•</property>
@@ -183,7 +190,7 @@
                           </object>
                         </child>
                         <child type="label">
-                          <object class="GtkLabel" id="command_entry_action_label">
+                          <object class="GtkLabel" id="command_action_label">
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
                             <property name="label" translatable="yes">&lt;b&gt;Action&lt;/b&gt;</property>
@@ -198,13 +205,13 @@
                       </packing>
                     </child>
                     <child>
-                      <object class="GtkFrame" id="command_entry_send_frame">
+                      <object class="GtkFrame" id="command_exec_frame">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
                         <property name="label_xalign">0</property>
                         <property name="shadow_type">none</property>
                         <child>
-                          <object class="GtkButton" id="command_entry_send_button">
+                          <object class="GtkButton" id="command_exec_button">
                             <property name="label">gtk-execute</property>
                             <property name="visible">True</property>
                             <property name="can_focus">True</property>
@@ -213,7 +220,7 @@
                           </object>
                         </child>
                         <child type="label">
-                          <object class="GtkLabel" id="command_entry_send_label">
+                          <object class="GtkLabel" id="command_exec_label">
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
                             <property name="use_markup">True</property>
@@ -277,6 +284,7 @@
                         <property name="visible">True</property>
                         <property name="can_focus">True</property>
                         <property name="model">services_liststore</property>
+                        <property name="headers_visible">False</property>
                       </object>
                       <packing>
                         <property name="expand">True</property>
@@ -507,7 +515,7 @@
                                 <property name="can_focus">True</property>
                                 <property name="receives_default">True</property>
                                 <child>
-                                  <object class="GtkImage" id="image_service_add">
+                                  <object class="GtkImage" id="service_add_image">
                                     <property name="visible">True</property>
                                     <property name="can_focus">False</property>
                                     <property name="stock">gtk-add</property>
@@ -542,7 +550,7 @@
                                 <property name="can_focus">True</property>
                                 <property name="receives_default">True</property>
                                 <child>
-                                  <object class="GtkImage" id="image_service_delete">
+                                  <object class="GtkImage" id="service_delete_image">
                                     <property name="visible">True</property>
                                     <property name="can_focus">False</property>
                                     <property name="stock">gtk-remove</property>
@@ -605,6 +613,7 @@
                         <property name="visible">True</property>
                         <property name="can_focus">True</property>
                         <property name="model">nodes_liststore</property>
+                        <property name="headers_visible">False</property>
                       </object>
                       <packing>
                         <property name="expand">True</property>
@@ -836,7 +845,7 @@
               </packing>
             </child>
             <child>
-              <object class="GtkTable" id="groups_tab">
+              <object class="GtkTable" id="groups_table">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <property name="border_width">5</property>
@@ -845,24 +854,24 @@
                 <property name="column_spacing">5</property>
                 <property name="row_spacing">5</property>
                 <child>
-                  <object class="GtkAspectFrame" id="groups_left_entry_aspectframe">
+                  <object class="GtkAspectFrame" id="groups_aspectframe">
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
                     <property name="label_xalign">0</property>
                     <property name="shadow_type">none</property>
                     <property name="xalign">0</property>
                     <child>
-                      <object class="GtkHBox" id="groups_left_entry_hbox">
+                      <object class="GtkHBox" id="groups_hbox">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
                         <child>
-                          <object class="GtkFrame" id="groups_left_entry_id_frame">
+                          <object class="GtkFrame" id="groups_entry_frame">
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
                             <property name="label_xalign">0</property>
                             <property name="shadow_type">none</property>
                             <child>
-                              <object class="GtkEntry" id="groups_left_entry_id_area">
+                              <object class="GtkEntry" id="groups_entry">
                                 <property name="visible">True</property>
                                 <property name="can_focus">True</property>
                                 <property name="invisible_char">•</property>
@@ -875,7 +884,7 @@
                               </object>
                             </child>
                             <child type="label">
-                              <object class="GtkLabel" id="groups_left_entry_id_label">
+                              <object class="GtkLabel" id="groups_frame_label">
                                 <property name="visible">True</property>
                                 <property name="can_focus">False</property>
                                 <property name="label" translatable="yes">&lt;b&gt;Group Name&lt;/b&gt;</property>
@@ -890,18 +899,18 @@
                           </packing>
                         </child>
                         <child>
-                          <object class="GtkFrame" id="groups_left_entry_add_frame">
+                          <object class="GtkFrame" id="groups_add_frame">
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
                             <property name="label_xalign">0</property>
                             <property name="shadow_type">none</property>
                             <child>
-                              <object class="GtkButton" id="groups_left_entry_add_button">
+                              <object class="GtkButton" id="groups_add_button">
                                 <property name="visible">True</property>
                                 <property name="can_focus">True</property>
                                 <property name="receives_default">True</property>
                                 <child>
-                                  <object class="GtkImage" id="groups_left_entry_add_img">
+                                  <object class="GtkImage" id="groups_add_image">
                                     <property name="visible">True</property>
                                     <property name="can_focus">False</property>
                                     <property name="stock">gtk-add</property>
@@ -910,7 +919,7 @@
                               </object>
                             </child>
                             <child type="label">
-                              <object class="GtkLabel" id="groups_left_entry_add_label">
+                              <object class="GtkLabel" id="groups_add_label">
                                 <property name="visible">True</property>
                                 <property name="can_focus">False</property>
                                 <property name="use_markup">True</property>
@@ -924,18 +933,18 @@
                           </packing>
                         </child>
                         <child>
-                          <object class="GtkFrame" id="groups_left_entry_del_frame">
+                          <object class="GtkFrame" id="groups_delete_frame">
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
                             <property name="label_xalign">0</property>
                             <property name="shadow_type">none</property>
                             <child>
-                              <object class="GtkButton" id="groups_left_entry_del_button">
+                              <object class="GtkButton" id="groups_delete_button">
                                 <property name="visible">True</property>
                                 <property name="can_focus">True</property>
                                 <property name="receives_default">True</property>
                                 <child>
-                                  <object class="GtkImage" id="groups_left_entry_del_img">
+                                  <object class="GtkImage" id="groups_delete_image">
                                     <property name="visible">True</property>
                                     <property name="can_focus">False</property>
                                     <property name="stock">gtk-remove</property>
@@ -944,7 +953,7 @@
                               </object>
                             </child>
                             <child type="label">
-                              <object class="GtkLabel" id="label1">
+                              <object class="GtkLabel" id="groups_delete_label">
                                 <property name="visible">True</property>
                                 <property name="can_focus">False</property>
                                 <property name="use_markup">True</property>
@@ -968,24 +977,24 @@
                   </packing>
                 </child>
                 <child>
-                  <object class="GtkAspectFrame" id="groups_right_entry_aspectframe">
+                  <object class="GtkAspectFrame" id="group_aspectframe">
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
                     <property name="label_xalign">0</property>
                     <property name="shadow_type">none</property>
                     <property name="xalign">0</property>
                     <child>
-                      <object class="GtkHBox" id="groups_right_entry_hbox">
+                      <object class="GtkHBox" id="group_hbox">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
                         <child>
-                          <object class="GtkFrame" id="groups_right_entry_service_frame">
+                          <object class="GtkFrame" id="group_service_entry_frame">
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
                             <property name="label_xalign">0</property>
                             <property name="shadow_type">none</property>
                             <child>
-                              <object class="GtkEntry" id="groups_right_entry_service_area">
+                              <object class="GtkEntry" id="group_service_entry">
                                 <property name="visible">True</property>
                                 <property name="can_focus">True</property>
                                 <property name="invisible_char">•</property>
@@ -998,7 +1007,7 @@
                               </object>
                             </child>
                             <child type="label">
-                              <object class="GtkLabel" id="groups_right_entry_service_label">
+                              <object class="GtkLabel" id="group_service_entry_label">
                                 <property name="visible">True</property>
                                 <property name="can_focus">False</property>
                                 <property name="label" translatable="yes">&lt;b&gt;Service&lt;/b&gt;</property>
@@ -1013,13 +1022,13 @@
                           </packing>
                         </child>
                         <child>
-                          <object class="GtkFrame" id="groups_right_entry_node_frame">
+                          <object class="GtkFrame" id="group_nodeset_entry_frame">
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
                             <property name="label_xalign">0</property>
                             <property name="shadow_type">none</property>
                             <child>
-                              <object class="GtkEntry" id="groups_right_entry_node_area">
+                              <object class="GtkEntry" id="group_nodeset_entry">
                                 <property name="visible">True</property>
                                 <property name="can_focus">True</property>
                                 <property name="invisible_char">•</property>
@@ -1032,7 +1041,7 @@
                               </object>
                             </child>
                             <child type="label">
-                              <object class="GtkLabel" id="groups_right_entry_node_label">
+                              <object class="GtkLabel" id="group_nodeset_entry_label">
                                 <property name="visible">True</property>
                                 <property name="can_focus">False</property>
                                 <property name="label" translatable="yes">&lt;b&gt;NodeSet&lt;/b&gt;</property>
@@ -1047,18 +1056,18 @@
                           </packing>
                         </child>
                         <child>
-                          <object class="GtkFrame" id="groups_right_entry_add_frame">
+                          <object class="GtkFrame" id="group_add_frame">
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
                             <property name="label_xalign">0</property>
                             <property name="shadow_type">none</property>
                             <child>
-                              <object class="GtkButton" id="groups_right_entry_add_button">
+                              <object class="GtkButton" id="group_add_button">
                                 <property name="visible">True</property>
                                 <property name="can_focus">True</property>
                                 <property name="receives_default">True</property>
                                 <child>
-                                  <object class="GtkImage" id="groups_add_button_img1">
+                                  <object class="GtkImage" id="group_add_image">
                                     <property name="visible">True</property>
                                     <property name="can_focus">False</property>
                                     <property name="stock">gtk-add</property>
@@ -1067,7 +1076,7 @@
                               </object>
                             </child>
                             <child type="label">
-                              <object class="GtkLabel" id="groups_right_entry_add_label">
+                              <object class="GtkLabel" id="group_add_label">
                                 <property name="visible">True</property>
                                 <property name="can_focus">False</property>
                                 <property name="use_markup">True</property>
@@ -1081,18 +1090,18 @@
                           </packing>
                         </child>
                         <child>
-                          <object class="GtkFrame" id="groups_right_entry_del_frame">
+                          <object class="GtkFrame" id="group_delete_frame">
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
                             <property name="label_xalign">0</property>
                             <property name="shadow_type">none</property>
                             <child>
-                              <object class="GtkButton" id="groups_right_entry_del_button">
+                              <object class="GtkButton" id="group_delete_button">
                                 <property name="visible">True</property>
                                 <property name="can_focus">True</property>
                                 <property name="receives_default">True</property>
                                 <child>
-                                  <object class="GtkImage" id="groups_right_entry_del_img">
+                                  <object class="GtkImage" id="group_delete_image">
                                     <property name="visible">True</property>
                                     <property name="can_focus">False</property>
                                     <property name="stock">gtk-remove</property>
@@ -1101,7 +1110,7 @@
                               </object>
                             </child>
                             <child type="label">
-                              <object class="GtkLabel" id="groups_right_entry_del_label">
+                              <object class="GtkLabel" id="group_delete_label">
                                 <property name="visible">True</property>
                                 <property name="can_focus">False</property>
                                 <property name="use_markup">True</property>
@@ -1127,13 +1136,14 @@
                   </packing>
                 </child>
                 <child>
-                  <object class="GtkTreeView" id="groups_left_treeview">
+                  <object class="GtkTreeView" id="groups_treeview">
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
+                    <property name="headers_visible">False</property>
                   </object>
                 </child>
                 <child>
-                  <object class="GtkTreeView" id="groups_right_treeview">
+                  <object class="GtkTreeView" id="group_treeview">
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                   </object>
@@ -1159,7 +1169,7 @@
               </packing>
             </child>
             <child>
-              <object class="GtkTable" id="dependencies_tab">
+              <object class="GtkTable" id="dependencies_table">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <property name="border_width">5</property>
@@ -1168,24 +1178,24 @@
                 <property name="column_spacing">5</property>
                 <property name="row_spacing">5</property>
                 <child>
-                  <object class="GtkAspectFrame" id="dependencies_left_entry_aspectframe">
+                  <object class="GtkAspectFrame" id="dependencies_service_aspectframe">
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
                     <property name="label_xalign">0</property>
                     <property name="shadow_type">none</property>
                     <property name="xalign">0</property>
                     <child>
-                      <object class="GtkHBox" id="dependencies_left_entry_hbox">
+                      <object class="GtkHBox" id="dependencies_service_hbox">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
                         <child>
-                          <object class="GtkFrame" id="dependencies_left_entry_service_frame">
+                          <object class="GtkFrame" id="dependencies_service_entry_frame">
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
                             <property name="label_xalign">0</property>
                             <property name="shadow_type">none</property>
                             <child>
-                              <object class="GtkEntry" id="dependencies_left_entry_service_area">
+                              <object class="GtkEntry" id="dependencies_service_entry">
                                 <property name="visible">True</property>
                                 <property name="can_focus">True</property>
                                 <property name="invisible_char">•</property>
@@ -1198,7 +1208,7 @@
                               </object>
                             </child>
                             <child type="label">
-                              <object class="GtkLabel" id="dependencies_left_entry_service_label">
+                              <object class="GtkLabel" id="dependencies_service_entry_label">
                                 <property name="visible">True</property>
                                 <property name="can_focus">False</property>
                                 <property name="label" translatable="yes">&lt;b&gt;Service&lt;/b&gt;</property>
@@ -1213,18 +1223,18 @@
                           </packing>
                         </child>
                         <child>
-                          <object class="GtkFrame" id="dependencies_left_entry_add_frame">
+                          <object class="GtkFrame" id="dependencies_service_add_frame">
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
                             <property name="label_xalign">0</property>
                             <property name="shadow_type">none</property>
                             <child>
-                              <object class="GtkButton" id="dependencies_left_entry_add_button">
+                              <object class="GtkButton" id="dependencies_service_add_button">
                                 <property name="visible">True</property>
                                 <property name="can_focus">True</property>
                                 <property name="receives_default">True</property>
                                 <child>
-                                  <object class="GtkImage" id="dependencies_left_entry_add_img">
+                                  <object class="GtkImage" id="dependencies_service_add_image">
                                     <property name="visible">True</property>
                                     <property name="can_focus">False</property>
                                     <property name="stock">gtk-add</property>
@@ -1233,7 +1243,7 @@
                               </object>
                             </child>
                             <child type="label">
-                              <object class="GtkLabel" id="dependencies_left_entry_add_label">
+                              <object class="GtkLabel" id="dependencies_service_add_label">
                                 <property name="visible">True</property>
                                 <property name="can_focus">False</property>
                                 <property name="use_markup">True</property>
@@ -1247,18 +1257,18 @@
                           </packing>
                         </child>
                         <child>
-                          <object class="GtkFrame" id="dependencies_left_entry_del_frame">
+                          <object class="GtkFrame" id="dependencies_service_delete_frame">
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
                             <property name="label_xalign">0</property>
                             <property name="shadow_type">none</property>
                             <child>
-                              <object class="GtkButton" id="dependencies_left_entry_del_button">
+                              <object class="GtkButton" id="dependencies_service_delete_button">
                                 <property name="visible">True</property>
                                 <property name="can_focus">True</property>
                                 <property name="receives_default">True</property>
                                 <child>
-                                  <object class="GtkImage" id="dependencies_left_entry_del_img">
+                                  <object class="GtkImage" id="dependencies_service_delete_image">
                                     <property name="visible">True</property>
                                     <property name="can_focus">False</property>
                                     <property name="stock">gtk-remove</property>
@@ -1267,7 +1277,7 @@
                               </object>
                             </child>
                             <child type="label">
-                              <object class="GtkLabel" id="dependencies_left_entry_del_label">
+                              <object class="GtkLabel" id="dependencies_service_delete_label">
                                 <property name="visible">True</property>
                                 <property name="can_focus">False</property>
                                 <property name="use_markup">True</property>
@@ -1291,24 +1301,24 @@
                   </packing>
                 </child>
                 <child>
-                  <object class="GtkAspectFrame" id="dependencies_edge_entry_aspectframe">
+                  <object class="GtkAspectFrame" id="dependencies_nodeset_aspectframe">
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
                     <property name="label_xalign">0</property>
                     <property name="shadow_type">none</property>
                     <property name="xalign">0</property>
                     <child>
-                      <object class="GtkHBox" id="dependencies_edge_entry_hbox">
+                      <object class="GtkHBox" id="dependencies_nodeset_hbox">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
                         <child>
-                          <object class="GtkFrame" id="dependencies_edge_entry_node_frame">
+                          <object class="GtkFrame" id="dependencies_nodeset_entry_frame">
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
                             <property name="label_xalign">0</property>
                             <property name="shadow_type">none</property>
                             <child>
-                              <object class="GtkEntry" id="dependencies_edge_entry_node_area">
+                              <object class="GtkEntry" id="dependencies_nodeset_entry">
                                 <property name="visible">True</property>
                                 <property name="can_focus">True</property>
                                 <property name="invisible_char">•</property>
@@ -1321,7 +1331,7 @@
                               </object>
                             </child>
                             <child type="label">
-                              <object class="GtkLabel" id="dependencies_edge_entry_node_label">
+                              <object class="GtkLabel" id="dependencies_nodeset_entry_label">
                                 <property name="visible">True</property>
                                 <property name="can_focus">False</property>
                                 <property name="label" translatable="yes">&lt;b&gt;NodeSet&lt;/b&gt;</property>
@@ -1336,18 +1346,18 @@
                           </packing>
                         </child>
                         <child>
-                          <object class="GtkFrame" id="dependencies_edge_entry_add_frame">
+                          <object class="GtkFrame" id="dependencies_nodeset_add_frame">
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
                             <property name="label_xalign">0</property>
                             <property name="shadow_type">none</property>
                             <child>
-                              <object class="GtkButton" id="dependencies_edge_entry_add_button">
+                              <object class="GtkButton" id="dependencies_nodeset_add_button">
                                 <property name="visible">True</property>
                                 <property name="can_focus">True</property>
                                 <property name="receives_default">True</property>
                                 <child>
-                                  <object class="GtkImage" id="dependencies_edge_entry_add_img">
+                                  <object class="GtkImage" id="dependencies_nodeset_add_image">
                                     <property name="visible">True</property>
                                     <property name="can_focus">False</property>
                                     <property name="stock">gtk-add</property>
@@ -1356,7 +1366,7 @@
                               </object>
                             </child>
                             <child type="label">
-                              <object class="GtkLabel" id="dependencies_edge_entry_add_label">
+                              <object class="GtkLabel" id="dependencies_nodeset_add_label">
                                 <property name="visible">True</property>
                                 <property name="can_focus">False</property>
                                 <property name="use_markup">True</property>
@@ -1370,18 +1380,18 @@
                           </packing>
                         </child>
                         <child>
-                          <object class="GtkFrame" id="dependencies_edge_entry_del_frame">
+                          <object class="GtkFrame" id="dependencies_nodeset_delete_frame">
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
                             <property name="label_xalign">0</property>
                             <property name="shadow_type">none</property>
                             <child>
-                              <object class="GtkButton" id="dependencies_edge_entry_del_button">
+                              <object class="GtkButton" id="dependencies_nodeset_delete_button">
                                 <property name="visible">True</property>
                                 <property name="can_focus">True</property>
                                 <property name="receives_default">True</property>
                                 <child>
-                                  <object class="GtkImage" id="dependencies_edge_entry_del_img">
+                                  <object class="GtkImage" id="dependencies_nodeset_delete_image">
                                     <property name="visible">True</property>
                                     <property name="can_focus">False</property>
                                     <property name="stock">gtk-remove</property>
@@ -1390,7 +1400,7 @@
                               </object>
                             </child>
                             <child type="label">
-                              <object class="GtkLabel" id="dependencies_edge_entry_del_label">
+                              <object class="GtkLabel" id="dependencies_nodeset_delete_label">
                                 <property name="visible">True</property>
                                 <property name="can_focus">False</property>
                                 <property name="use_markup">True</property>
@@ -1416,24 +1426,24 @@
                   </packing>
                 </child>
                 <child>
-                  <object class="GtkAspectFrame" id="dependencies_right_entry_aspectframe">
+                  <object class="GtkAspectFrame" id="dependencies_dependencies_aspectframe">
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
                     <property name="label_xalign">0</property>
                     <property name="shadow_type">none</property>
                     <property name="xalign">0</property>
                     <child>
-                      <object class="GtkHBox" id="dependencies_right_entry_hbox">
+                      <object class="GtkHBox" id="dependencies_dependencies_hbox">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
                         <child>
-                          <object class="GtkFrame" id="dependencies_right_entry_dependencies_frame">
+                          <object class="GtkFrame" id="dependencies_dependencies_entry_frame">
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
                             <property name="label_xalign">0</property>
                             <property name="shadow_type">none</property>
                             <child>
-                              <object class="GtkEntry" id="dependencies_right_entry_dependencies_area">
+                              <object class="GtkEntry" id="dependencies_dependencies_entry">
                                 <property name="visible">True</property>
                                 <property name="can_focus">True</property>
                                 <property name="invisible_char">•</property>
@@ -1446,7 +1456,7 @@
                               </object>
                             </child>
                             <child type="label">
-                              <object class="GtkLabel" id="dependencies_right_entry_dependencies_label">
+                              <object class="GtkLabel" id="dependencies_dependencies_entry_label">
                                 <property name="visible">True</property>
                                 <property name="can_focus">False</property>
                                 <property name="label" translatable="yes">&lt;b&gt;Dependencies&lt;/b&gt;</property>
@@ -1461,18 +1471,18 @@
                           </packing>
                         </child>
                         <child>
-                          <object class="GtkFrame" id="dependencies_right_entry_add_frame">
+                          <object class="GtkFrame" id="dependencies_dependencies_add_frame">
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
                             <property name="label_xalign">0</property>
                             <property name="shadow_type">none</property>
                             <child>
-                              <object class="GtkButton" id="dependencies_right_entry_add_button">
+                              <object class="GtkButton" id="dependencies_dependencies_add_button">
                                 <property name="visible">True</property>
                                 <property name="can_focus">True</property>
                                 <property name="receives_default">True</property>
                                 <child>
-                                  <object class="GtkImage" id="dependencies_right_entry_add_img1">
+                                  <object class="GtkImage" id="dependencies_dependencies_add_image">
                                     <property name="visible">True</property>
                                     <property name="can_focus">False</property>
                                     <property name="stock">gtk-add</property>
@@ -1481,7 +1491,7 @@
                               </object>
                             </child>
                             <child type="label">
-                              <object class="GtkLabel" id="dependencies_right_entry_add_label">
+                              <object class="GtkLabel" id="dependencies_dependencies_add_label">
                                 <property name="visible">True</property>
                                 <property name="can_focus">False</property>
                                 <property name="use_markup">True</property>
@@ -1495,18 +1505,18 @@
                           </packing>
                         </child>
                         <child>
-                          <object class="GtkFrame" id="dependencies_right_entry_del_frame">
+                          <object class="GtkFrame" id="dependencies_dependencies_delete_frame">
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
                             <property name="label_xalign">0</property>
                             <property name="shadow_type">none</property>
                             <child>
-                              <object class="GtkButton" id="dependencies_right_entry_del_button">
+                              <object class="GtkButton" id="dependencies_dependencies_delete_button">
                                 <property name="visible">True</property>
                                 <property name="can_focus">True</property>
                                 <property name="receives_default">True</property>
                                 <child>
-                                  <object class="GtkImage" id="dependencies_right_entry_del_img">
+                                  <object class="GtkImage" id="dependencies_dependencies_delete_image">
                                     <property name="visible">True</property>
                                     <property name="can_focus">False</property>
                                     <property name="stock">gtk-remove</property>
@@ -1515,7 +1525,7 @@
                               </object>
                             </child>
                             <child type="label">
-                              <object class="GtkLabel" id="dependencies_right_entry_del_label">
+                              <object class="GtkLabel" id="dependencies_dependencies_delete_label">
                                 <property name="visible">True</property>
                                 <property name="can_focus">False</property>
                                 <property name="use_markup">True</property>
@@ -1541,15 +1551,17 @@
                   </packing>
                 </child>
                 <child>
-                  <object class="GtkTreeView" id="dependencies_left_treeview">
+                  <object class="GtkTreeView" id="dependencies_service_treeview">
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
+                    <property name="headers_visible">False</property>
                   </object>
                 </child>
                 <child>
-                  <object class="GtkTreeView" id="dependencies_edge_treeview">
+                  <object class="GtkTreeView" id="dependencies_nodeset_treeview">
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
+                    <property name="headers_visible">False</property>
                   </object>
                   <packing>
                     <property name="left_attach">1</property>
@@ -1557,9 +1569,10 @@
                   </packing>
                 </child>
                 <child>
-                  <object class="GtkTreeView" id="dependencies_right_treeview">
+                  <object class="GtkTreeView" id="dependencies_dependencies_treeview">
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
+                    <property name="headers_visible">False</property>
                   </object>
                   <packing>
                     <property name="left_attach">2</property>
@@ -1607,12 +1620,6 @@
       </object>
     </child>
   </object>
-  <object class="GtkListStore" id="nodes_liststore">
-    <columns>
-      <!-- column-name NodeSet -->
-      <column type="gchararray"/>
-    </columns>
-  </object>
   <object class="GtkListStore" id="service_liststore">
     <columns>
       <!-- column-name NodeSet -->
@@ -1623,7 +1630,7 @@
   </object>
   <object class="GtkListStore" id="services_liststore">
     <columns>
-      <!-- column-name Services -->
+      <!-- column-name Service -->
       <column type="gchararray"/>
     </columns>
   </object>
@@ -1631,7 +1638,7 @@
     <columns>
       <!-- column-name NodeSet -->
       <column type="gchararray"/>
-      <!-- column-name Services -->
+      <!-- column-name Service -->
       <column type="gchararray"/>
       <!-- column-name Status -->
       <column type="gchararray"/>
