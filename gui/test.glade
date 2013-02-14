@@ -38,6 +38,12 @@
       <column type="gchararray"/>
     </columns>
   </object>
+  <object class="GtkListStore" id="groups_liststore">
+    <columns>
+      <!-- column-name Groups -->
+      <column type="gchararray"/>
+    </columns>
+  </object>
   <object class="GtkListStore" id="node_manager_liststore">
     <columns>
       <!-- column-name Manager -->
@@ -47,12 +53,6 @@
   <object class="GtkListStore" id="nodes_liststore">
     <columns>
       <!-- column-name NodeSet -->
-      <column type="gchararray"/>
-    </columns>
-  </object>
-  <object class="GtkListStore" id="groups_liststore">
-    <columns>
-      <!-- column-name Groups -->
       <column type="gchararray"/>
     </columns>
   </object>
@@ -213,6 +213,7 @@
                         <child>
                           <object class="GtkButton" id="command_exec_button">
                             <property name="label">gtk-execute</property>
+                            <property name="use_action_appearance">False</property>
                             <property name="visible">True</property>
                             <property name="can_focus">True</property>
                             <property name="receives_default">True</property>
@@ -285,6 +286,7 @@
                         <property name="can_focus">True</property>
                         <property name="model">services_liststore</property>
                         <property name="headers_visible">False</property>
+                        <signal name="cursor-changed" handler="on_services_treeview_cursor_changed" swapped="no"/>
                       </object>
                       <packing>
                         <property name="expand">True</property>
@@ -338,6 +340,7 @@
                             <property name="shadow_type">none</property>
                             <child>
                               <object class="GtkButton" id="services_add_button">
+                                <property name="use_action_appearance">False</property>
                                 <property name="visible">True</property>
                                 <property name="can_focus">True</property>
                                 <property name="receives_default">True</property>
@@ -373,9 +376,11 @@
                             <property name="shadow_type">none</property>
                             <child>
                               <object class="GtkButton" id="services_delete_button">
+                                <property name="use_action_appearance">False</property>
                                 <property name="visible">True</property>
                                 <property name="can_focus">True</property>
                                 <property name="receives_default">True</property>
+                                <signal name="released" handler="on_services_delete" swapped="no"/>
                                 <child>
                                   <object class="GtkImage" id="services_delete_image">
                                     <property name="visible">True</property>
@@ -511,6 +516,7 @@
                             <property name="shadow_type">none</property>
                             <child>
                               <object class="GtkButton" id="service_add_button">
+                                <property name="use_action_appearance">False</property>
                                 <property name="visible">True</property>
                                 <property name="can_focus">True</property>
                                 <property name="receives_default">True</property>
@@ -546,9 +552,11 @@
                             <property name="shadow_type">none</property>
                             <child>
                               <object class="GtkButton" id="service_delete_button">
+                                <property name="use_action_appearance">False</property>
                                 <property name="visible">True</property>
                                 <property name="can_focus">True</property>
                                 <property name="receives_default">True</property>
+                                <signal name="released" handler="on_service_delete" swapped="no"/>
                                 <child>
                                   <object class="GtkImage" id="service_delete_image">
                                     <property name="visible">True</property>
@@ -667,6 +675,7 @@
                             <property name="shadow_type">none</property>
                             <child>
                               <object class="GtkButton" id="nodes_add_button">
+                                <property name="use_action_appearance">False</property>
                                 <property name="visible">True</property>
                                 <property name="can_focus">True</property>
                                 <property name="receives_default">True</property>
@@ -702,9 +711,11 @@
                             <property name="shadow_type">none</property>
                             <child>
                               <object class="GtkButton" id="nodes_delete_button">
+                                <property name="use_action_appearance">False</property>
                                 <property name="visible">True</property>
                                 <property name="can_focus">True</property>
                                 <property name="receives_default">True</property>
+                                <signal name="released" handler="on_nodes_delete" swapped="no"/>
                                 <child>
                                   <object class="GtkImage" id="nodes_delete_image">
                                     <property name="visible">True</property>
@@ -906,6 +917,7 @@
                             <property name="shadow_type">none</property>
                             <child>
                               <object class="GtkButton" id="groups_add_button">
+                                <property name="use_action_appearance">False</property>
                                 <property name="visible">True</property>
                                 <property name="can_focus">True</property>
                                 <property name="receives_default">True</property>
@@ -940,9 +952,11 @@
                             <property name="shadow_type">none</property>
                             <child>
                               <object class="GtkButton" id="groups_delete_button">
+                                <property name="use_action_appearance">False</property>
                                 <property name="visible">True</property>
                                 <property name="can_focus">True</property>
                                 <property name="receives_default">True</property>
+                                <signal name="released" handler="on_groups_delete" swapped="no"/>
                                 <child>
                                   <object class="GtkImage" id="groups_delete_image">
                                     <property name="visible">True</property>
@@ -1063,6 +1077,7 @@
                             <property name="shadow_type">none</property>
                             <child>
                               <object class="GtkButton" id="group_add_button">
+                                <property name="use_action_appearance">False</property>
                                 <property name="visible">True</property>
                                 <property name="can_focus">True</property>
                                 <property name="receives_default">True</property>
@@ -1097,9 +1112,11 @@
                             <property name="shadow_type">none</property>
                             <child>
                               <object class="GtkButton" id="group_delete_button">
+                                <property name="use_action_appearance">False</property>
                                 <property name="visible">True</property>
                                 <property name="can_focus">True</property>
                                 <property name="receives_default">True</property>
+                                <signal name="pressed" handler="on_group_delete" swapped="no"/>
                                 <child>
                                   <object class="GtkImage" id="group_delete_image">
                                     <property name="visible">True</property>
@@ -1139,13 +1156,16 @@
                   <object class="GtkTreeView" id="groups_treeview">
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
+                    <property name="model">groups_liststore</property>
                     <property name="headers_visible">False</property>
+                    <signal name="cursor-changed" handler="on_groups_treeview_cursor_changed" swapped="no"/>
                   </object>
                 </child>
                 <child>
                   <object class="GtkTreeView" id="group_treeview">
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
+                    <property name="model">group_liststore</property>
                   </object>
                   <packing>
                     <property name="left_attach">1</property>
@@ -1230,6 +1250,7 @@
                             <property name="shadow_type">none</property>
                             <child>
                               <object class="GtkButton" id="dependencies_service_add_button">
+                                <property name="use_action_appearance">False</property>
                                 <property name="visible">True</property>
                                 <property name="can_focus">True</property>
                                 <property name="receives_default">True</property>
@@ -1264,9 +1285,11 @@
                             <property name="shadow_type">none</property>
                             <child>
                               <object class="GtkButton" id="dependencies_service_delete_button">
+                                <property name="use_action_appearance">False</property>
                                 <property name="visible">True</property>
                                 <property name="can_focus">True</property>
                                 <property name="receives_default">True</property>
+                                <signal name="released" handler="on_dependencies_service_delete" swapped="no"/>
                                 <child>
                                   <object class="GtkImage" id="dependencies_service_delete_image">
                                     <property name="visible">True</property>
@@ -1353,6 +1376,7 @@
                             <property name="shadow_type">none</property>
                             <child>
                               <object class="GtkButton" id="dependencies_nodeset_add_button">
+                                <property name="use_action_appearance">False</property>
                                 <property name="visible">True</property>
                                 <property name="can_focus">True</property>
                                 <property name="receives_default">True</property>
@@ -1387,9 +1411,11 @@
                             <property name="shadow_type">none</property>
                             <child>
                               <object class="GtkButton" id="dependencies_nodeset_delete_button">
+                                <property name="use_action_appearance">False</property>
                                 <property name="visible">True</property>
                                 <property name="can_focus">True</property>
                                 <property name="receives_default">True</property>
+                                <signal name="released" handler="on_dependencies_nodeset_delete" swapped="no"/>
                                 <child>
                                   <object class="GtkImage" id="dependencies_nodeset_delete_image">
                                     <property name="visible">True</property>
@@ -1478,6 +1504,7 @@
                             <property name="shadow_type">none</property>
                             <child>
                               <object class="GtkButton" id="dependencies_dependencies_add_button">
+                                <property name="use_action_appearance">False</property>
                                 <property name="visible">True</property>
                                 <property name="can_focus">True</property>
                                 <property name="receives_default">True</property>
@@ -1512,9 +1539,11 @@
                             <property name="shadow_type">none</property>
                             <child>
                               <object class="GtkButton" id="dependencies_dependencies_delete_button">
+                                <property name="use_action_appearance">False</property>
                                 <property name="visible">True</property>
                                 <property name="can_focus">True</property>
                                 <property name="receives_default">True</property>
+                                <signal name="released" handler="on_dependencies_dependencies_delete" swapped="no"/>
                                 <child>
                                   <object class="GtkImage" id="dependencies_dependencies_delete_image">
                                     <property name="visible">True</property>
@@ -1554,14 +1583,18 @@
                   <object class="GtkTreeView" id="dependencies_service_treeview">
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
+                    <property name="model">dependencies_service_liststore</property>
                     <property name="headers_visible">False</property>
+                    <signal name="cursor-changed" handler="on_dependencies_services_treeview_cursor_changed" swapped="no"/>
                   </object>
                 </child>
                 <child>
                   <object class="GtkTreeView" id="dependencies_nodeset_treeview">
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
+                    <property name="model">dependencies_nodeset_liststore</property>
                     <property name="headers_visible">False</property>
+                    <signal name="cursor-changed" handler="on_dependencies_nodeset_treeview_cursor_changed" swapped="no"/>
                   </object>
                   <packing>
                     <property name="left_attach">1</property>
@@ -1572,6 +1605,7 @@
                   <object class="GtkTreeView" id="dependencies_dependencies_treeview">
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
+                    <property name="model">dependencies_dependencies_liststore</property>
                     <property name="headers_visible">False</property>
                   </object>
                   <packing>
