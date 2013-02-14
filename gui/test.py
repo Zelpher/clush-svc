@@ -15,10 +15,14 @@ import Node
 
 class Hello:
     def __init__(self):
+        self.config = Config.Config()
         self.interface = gtk.Builder()
+
         self.interface.add_from_file('test.glade')
         self.interface.connect_signals(self)
+
         self.all_treeview_init()
+        self.all_liststores_init()
 
         self.command_target_switch = False
         self.interface.get_object('command_radio_nodeset_radiobutton').set_active(True)
@@ -31,6 +35,9 @@ class Hello:
         gtk.main_quit()
 
     def all_treeview_init(self):
+        """
+        Add columns to every treeview
+        """
         cell = gtk.CellRendererText()
         treeviews = {
             'status_treeview': ['NodeSet', 'Service', 'Status'],
@@ -100,6 +107,20 @@ class Hello:
         else:
             self.interface.get_object('command_service_frame').show_all()
         self.command_target_switch = not self.command_target_switch
+
+    def all_liststores_init(self):
+        """
+        Put data from config into all base liststores
+        """
+        [ self.interface.get_object("services_liststore").append([service])
+                for service in self.config.services.services ]
+        [ self.interface.get_object("groups_liststore").append([group])
+                for group in self.config.groups.groups ]
+        [ self.interface.get_object("nodes_liststore").append([node])
+                for node in self.config.nodes.nodes ]
+        [ self.interface.get_object("dependencies_dependencies_liststore")
+                .append([dependency])
+                for dependency in self.config.dependencies.dependencies ]
 
 if __name__ == "__main__":
     Hello()
