@@ -1,36 +1,34 @@
 #!/usr/bin/env python
 
-from sys import path as syspath
 import pygtk
 pygtk.require("2.0")
 import gtk
 
 from ClusterShell import NodeSet
 
-syspath.append('..')
-import TabManagers
+import GUITabManagers
 import ClushSvcCLI
 import Config
 import Node
 
-class Hello:
+class ClushSvcGUI:
     def __init__(self):
         self.config = Config.Config()
         self.interface = gtk.Builder()
 
-        self.interface.add_from_file('test.glade')
+        self.interface.add_from_file('ClushSvcGUI.glade')
         self.interface.connect_signals(self)
 
-        self.groups = TabManagers.DictDictTabManager(self.interface,
+        self.groups = GUITabManagers.DictDictTabManager(self.interface,
                 self.config.groups.groups, "groups_treeview", "group_treeview",
                 "groups_entry", "group_service_entry", "group_nodeset_entry",
                 (str, str, NodeSet.NodeSet))
-        self.services = TabManagers.DictDictTabManager(self.interface,
+        self.services = GUITabManagers.DictDictTabManager(self.interface,
                 self.config.services.services,
                 "services_treeview", "service_treeview","services_entry",
                 "service_nodeset_entry", "service_alias_entry",
                 (str, NodeSet.NodeSet, str))
-        self.dependencies = TabManagers.DictDictListTabManager(self.interface,
+        self.dependencies = GUITabManagers.DictDictListTabManager(self.interface,
                 self.config.dependencies.dependencies,
                 "dependencies_services_treeview",
                 "dependencies_nodeset_treeview",
@@ -38,7 +36,7 @@ class Hello:
                 "dependencies_services_entry", "dependencies_nodeset_entry",
                 "dependencies_dependencies_entry",
                 (str, NodeSet.NodeSet, str))
-        self.nodes = TabManagers.NodesTabManager(self.interface,
+        self.nodes = GUITabManagers.NodesTabManager(self.interface,
                 self.config.nodes.nodes, "nodes_treeview", "nodes_edit_entry",
                 (str, Node.Node))
 
@@ -54,6 +52,8 @@ class Hello:
         # First status check on launch
         self.main_tabs_widget = self.interface.get_object('main_tabs')
         self.on_main_tabs_switch_page(self.main_tabs_widget, self.main_tabs_widget.get_nth_page(0), 0)
+
+        gtk.main()
 
     def all_treeview_init(self):
         """
@@ -247,5 +247,4 @@ class Hello:
         self.dependencies.update_secProps()
 
 if __name__ == "__main__":
-    Hello()
-    gtk.main()
+    ClushSvcGUI()
