@@ -53,25 +53,27 @@ class ClushSvcCLI:
             for dependency in dependencies[depgroupindex]:
                 commands.update(Node.Node.group_by_script(self.config, dependency, 
                     dependencies[depgroupindex][dependency]))
-            tasks = self.tasks_run(commands, action)
-            for (task, script) in tasks:
-                task.join()
-                task.abort()
-            print "--------------------------"
-            # check status for each service
-            if action not in ('status', 'stop'):
-                tasks = self.tasks_run(commands, 'status')
+            if action not in ('status'):
+                tasks = self.tasks_run(commands, action)
                 for (task, script) in tasks:
                     task.join()
-                    for (rc, keys) in task.iter_retcodes():
-                        nodes = NodeSet.NodeSet.fromlist(keys)
-                        if rc != 0:
-                            self.result.append((nodes, script, "failed"))
-                            print "%s on %s: failed" %(script, nodes)
-                            self.remove_nodes_from_tree(dependencies, nodes)
-                        else:
-                            self.result.append((nodes, script, "success"))
                     task.abort()
+                print "--------------------------"
+            # check status for each service
+            tasks = self.tasks_run(commands, 'status')
+            for (task, script) in tasks:
+                task.join()
+                for (rc, keys) in task.iter_retcodes():
+                    nodes = NodeSet.NodeSet.fromlist(keys)
+                    success = False if rc != 0 else True
+                    success = not success if action in ('stop') else success
+                    if success:
+                        self.result.append((nodes, script, "success"))
+                    else:
+                        self.result.append((nodes, script, "failed"))
+                        print "%s on %s: failed" %(script, nodes)
+                        self.remove_nodes_from_tree(dependencies, nodes)
+                task.abort()
             print "=========================="
 
     def main(self):
