@@ -8,7 +8,9 @@ import gtk
 from ClusterShell import NodeSet
 
 syspath.append('..')
+import ClushSvcCLI
 import Config
+import Node
 
 class Hello:
     def __init__(self):
@@ -20,6 +22,13 @@ class Hello:
 
         self.all_treeview_init()
         self.all_liststores_init()
+
+        self.command_target_switch = False
+        self.interface.get_object('command_radio_nodeset_radiobutton').set_active(True)
+
+        self.command = ClushSvcCLI.ClushSvcCLI()
+        self.command.config = Config.Config()
+
 
     def on_main_window_destroy(self, widget):
         gtk.main_quit()
@@ -37,7 +46,7 @@ class Hello:
             'nodes_treeview': ['NodeSet'],
             'groups_treeview': ['Group'],
             'group_treeview': ['Service', 'Nodes'],
-            'dependencies_service_treeview': ['Service'],
+            'dependencies_services_treeview': ['Service'],
             'dependencies_nodeset_treeview': ['NodeSet'],
             'dependencies_dependencies_treeview': ['Dependencies'],
         }
@@ -55,6 +64,50 @@ class Hello:
                 col.add_attribute(cell, "text", column)
                 col.set_resizable(True)
 
+    def on_command_exec(self, widget):
+        self.interface.get_object('command_liststore').clear()
+
+        target = self.interface.get_object('command_target_entry').get_text()
+        service = self.interface.get_object('command_service_entry').get_text()
+        action = self.interface.get_object('command_action_entry').get_text()
+
+        # Same bloc as in ClushSvcCLI.main
+        # ==========
+        # are we using groups?
+        if (not self.command_target_switch):
+            arg_group = target
+            arg_action = action
+            arg_task = self.command.config.groups.get(arg_group.lower())
+            for service in arg_task:
+                arg_task[service] = set(self.command.config.nodes.get_from_nodeset(
+                    arg_task[service]))
+        else:
+            arg_nodes = self.command.config.nodes.get_from_nodeset(NodeSet.NodeSet(
+                target.lower()))
+            arg_service = service
+            arg_action = action
+            arg_task = {arg_service: set(arg_nodes)}
+
+        # Do we check dependencies too?
+        if arg_action in ('start', 'status'): # if arg_action not in ('stop', 'restart')
+            dependencies = self.command.config.dependencies.get_recursive(arg_task)
+            dependencies.append(arg_task)
+            self.command.dependencies_run(dependencies, arg_action)
+        else:
+            dependencies = [arg_task]
+            self.command.dependencies_run(dependencies, arg_action)
+        # ==========
+
+        for (nodes, script, status) in self.command.result:
+            self.interface.get_object('command_liststore').append([nodes, script, status])
+
+    def on_command_target_switch(self, widget):
+        if self.command_target_switch:
+            self.interface.get_object('command_service_frame').hide_all()
+        else:
+            self.interface.get_object('command_service_frame').show_all()
+        self.command_target_switch = not self.command_target_switch
+
     def all_liststores_init(self):
         """
         Put data from config into all base liststores
@@ -65,7 +118,7 @@ class Hello:
             for group in self.config.groups.groups ]
         [ self.interface.get_object("nodes_liststore").append([node])
             for node in self.config.nodes.nodes ]
-        [ self.interface.get_object("dependencies_service_liststore")
+        [ self.interface.get_object("dependencies_services_liststore")
             .append([dependency])
             for dependency in self.config.dependencies.dependencies ]
 
@@ -162,7 +215,7 @@ class Hello:
             "dependencies_dependencies_treeview").get_model().clear()
 
     def on_dependencies_nodeset_treeview_cursor_changed(self, treeview):
-        service_tv = self.interface.get_object("dependencies_service_treeview")
+        service_tv = self.interface.get_object("dependencies_services_treeview")
         service = service_tv.get_model()[service_tv.get_cursor()[0]][0]
         nodeset = treeview.get_cursor()[0][0]
         dependencies_liststore = self.interface.get_object(
@@ -173,9 +226,9 @@ class Hello:
             self.config.dependencies.dependencies[service][
             self.config.dependencies.dependencies[service].keys()[nodeset]] ]
 
-    def on_dependencies_service_delete(self, button):
+    def on_dependencies_services_delete(self, button):
         (services, selected) = self.interface.get_object(
-            "dependencies_service_treeview").get_selection().get_selected_rows()
+            "dependencies_services_treeview").get_selection().get_selected_rows()
         for index in selected:
             service = services[index][0]
             del self.config.dependencies.dependencies[service]
@@ -191,7 +244,7 @@ class Hello:
             "dependencies_nodeset_treeview").get_selection().get_selected_rows()
         if selected:
             services = self.interface.get_object(
-                "dependencies_service_treeview")
+                "dependencies_services_treeview")
             service_name = services.get_model()[services.get_cursor()[0]][0]
             selected = [ index[0] for index in selected ]
             selected.sort(); selected.reverse()
@@ -214,7 +267,7 @@ class Hello:
             nodesets = self.interface.get_object(
                 "dependencies_nodeset_treeview")
             nodeset_number = nodesets.get_cursor()[0][0]
-            services = self.interface.get_object("dependencies_service_treeview")
+            services = self.interface.get_object("dependencies_services_treeview")
             service_name = services.get_model()[services.get_cursor()[0]][0]
             for index in selected:
                 dependency = dependencies[index][0]
