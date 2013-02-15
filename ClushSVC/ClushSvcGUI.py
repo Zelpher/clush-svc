@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 
+import os.path as os_path
+
 import pygtk
 pygtk.require("2.0")
 import gtk
@@ -16,7 +18,8 @@ class ClushSvcGUI:
         self.config = Config.Config()
         self.interface = gtk.Builder()
 
-        self.interface.add_from_file('ClushSvcGUI.glade')
+        myPath = os_path.dirname(os_path.abspath(__file__))
+        self.interface.add_from_file(os_path.join(myPath, 'ClushSvcGUI.glade'))
         self.interface.connect_signals(self)
 
         self.groups = GUITabManagers.DictDictTabManager(self.interface,

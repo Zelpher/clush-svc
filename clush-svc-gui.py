@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-import ClushSvcGUI
+from ClushSVC import ClushSvcGUI
 
 if __name__ == '__main__':
     ClushSvcGUI.ClushSvcGUI()
