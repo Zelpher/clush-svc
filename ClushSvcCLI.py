@@ -1,4 +1,5 @@
 from optparse import OptionParser
+import sys
 
 import ClusterShell.Task as Task
 import ClusterShell.NodeSet as NodeSet
@@ -29,18 +30,20 @@ class ClushSvcCLI:
         Prepare and run tasks
         """
         print "TASKS RUN =>", action
-        tasks = []
+        workers = []
+        task = Task.task_self()
         for script in arg_tasks:
             groupedNodes = Node.Node.group_by_manager(arg_tasks[script])
             for manager in groupedNodes:
-                task = Task.Task()
                 nodesList = ','.join([node.name for node in groupedNodes[manager]])
                 command = managers.get_command(manager=manager, service=script,
                     action=action)
                 print "Task run: " + command + ", nodes: " + nodesList
-                task.run(command, nodes=nodesList)
-                tasks.append((task, script))
-        return tasks
+                worker = task.shell(command, nodes=nodesList)
+                workers.append((worker, script))
+        task.run()
+        task.join()
+        return workers
 
     def dependencies_run(self, dependencies, action):
         """
@@ -55,14 +58,10 @@ class ClushSvcCLI:
                     dependencies[depgroupindex][dependency]))
             if action not in ('status'):
                 tasks = self.tasks_run(commands, action)
-                for (task, script) in tasks:
-                    task.join()
-                    task.abort()
                 print "--------------------------"
             # check status for each service
             tasks = self.tasks_run(commands, 'status')
             for (task, script) in tasks:
-                task.join()
                 for (rc, keys) in task.iter_retcodes():
                     nodes = NodeSet.NodeSet.fromlist(keys)
                     success = False if rc != 0 else True
@@ -73,7 +72,6 @@ class ClushSvcCLI:
                         self.result.append((nodes, script, "failed"))
                         print "%s on %s: failed" %(script, nodes)
                         self.remove_nodes_from_tree(dependencies, nodes)
-                task.abort()
             print "=========================="
 
     def main(self):
@@ -83,9 +81,14 @@ class ClushSvcCLI:
         arg_action = None
 
         # Parse command line options
-        parser = OptionParser()
-        parser.add_option("-w", dest="nodes")
+        parser = OptionParser(usage="%prog [-w NODES SERVICE | " +
+                "GROUP] ACTION")
+        parser.add_option("-w", dest="nodes",
+                help="nodes where to run the command")
         (options, args) = parser.parse_args()
+        if len(args) != 2:
+            parser.print_usage()
+            sys.exit(1)
 
         # Read config
         self.config = Config.Config()
