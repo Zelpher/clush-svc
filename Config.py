@@ -160,7 +160,7 @@ class Config:
             Return the services and associated NodeSets of a given group by its name.
             { serviceName: <NodeSet object>, ... }
             """
-            return self.groups[group] if group in self.groups else {}
+            return self.groups[group].copy() if group in self.groups else {}
     ##########
 
     def __init__(self):

@@ -7,7 +7,6 @@ import Config, Node
 import managers
 
 class ClushSvcCLI:
-
     def __init__(self):
         self.config = None
         # For GUI display
