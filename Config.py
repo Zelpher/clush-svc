@@ -20,7 +20,7 @@ class Config:
             conf.read(['/etc/clush-svc/nodes.cfg',
                 os.path.expanduser('~/.config/clush-svc/nodes.cfg')])
             try:
-                for (nodes, manager) in conf.items('Managers'):
+                for (nodes, manager) in conf.items('managers'):
                     for node in NodeSet.NodeSet(nodes):
                         node = node.lower()
                         if node not in self.nodes:
@@ -32,12 +32,12 @@ class Config:
 
         def save(self):
             conf = ConfigParser()
-            conf.add_section('Managers')
+            conf.add_section('managers')
             nodesByManager = Node.Node.group_by_manager(self.nodes.values())
             for manager in nodesByManager:
                 nodes = NodeSet.NodeSet().fromlist([ node.name for node in
                     nodesByManager[manager] ])
-                conf.set('Managers', str(nodes), manager)
+                conf.set('managers', str(nodes), manager)
             cfgfile = open(os.path.expanduser(
                 '~/.config/clush-svc/nodes.cfg'), 'w')
             conf.write(cfgfile)
