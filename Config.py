@@ -1,6 +1,6 @@
 import os
 
-from ConfigParser import ConfigParser
+from ConfigParser import ConfigParser, NoSectionError
 import ClusterShell.NodeSet as NodeSet
 import Node, CircularDependencyError
 
@@ -19,13 +19,16 @@ class Config:
             conf = ConfigParser()
             conf.read(['/etc/clush-svc/nodes.cfg',
                 os.path.expanduser('~/.config/clush-svc/nodes.cfg')])
-            for (nodes, manager) in conf.items('Managers'):
-                for node in NodeSet.NodeSet(nodes):
-                    node = node.lower()
-                    if node not in self.nodes:
-                        self.nodes[node] = Node.Node()
-                    self.nodes[node].name = node
-                    self.nodes[node].manager = manager
+            try:
+                for (nodes, manager) in conf.items('Managers'):
+                    for node in NodeSet.NodeSet(nodes):
+                        node = node.lower()
+                        if node not in self.nodes:
+                            self.nodes[node] = Node.Node()
+                        self.nodes[node].name = node
+                        self.nodes[node].manager = manager
+            except NoSectionError:
+                pass
 
         def save(self):
             conf = ConfigParser()
@@ -218,6 +221,13 @@ class Config:
         self.groups = Config.Groups(self)
         self.load()
 
+    def check_home_cfg(self):
+        path = os.path.expanduser("~/.config/clush-svc")
+        try:
+            os.listdir(path)
+        except OSError:
+            os.mkdir(path)
+
     def load(self):
         """
         Read config files and load them
@@ -231,6 +241,7 @@ class Config:
         """
         Save config to files in ~/.config/clush-svc/
         """
+        self.check_home_cfg()
         self.nodes.save()
         self.services.save()
         self.dependencies.save()
