@@ -21,18 +21,26 @@ class Hello:
         self.interface.add_from_file('test.glade')
         self.interface.connect_signals(self)
 
-        self.nodes = TabManagers.DictTabManager(self.interface,
-                self.config.nodes.nodes, "nodes_treeview")
-        self.services = TabManagers.DictListTabManager(self.interface,
-            self.config.services.services,
-            "services_treeview", "service_treeview")
-        self.groups = TabManagers.DictListTabManager(self.interface,
-            self.config.groups.groups, "groups_treeview", "group_treeview")
-        self.dependencies = TabManagers.DictListListTabManager(self.interface,
+        self.groups = TabManagers.DictDictTabManager(self.interface,
+                self.config.groups.groups, "groups_treeview", "group_treeview",
+                "groups_entry", "group_service_entry", "group_nodeset_entry",
+                (str, str, NodeSet.NodeSet))
+        self.services = TabManagers.DictDictTabManager(self.interface,
+                self.config.services.services,
+                "services_treeview", "service_treeview","services_entry",
+                "service_nodeset_entry", "service_alias_entry",
+                (str, NodeSet.NodeSet, str))
+        self.dependencies = TabManagers.DictDictListTabManager(self.interface,
                 self.config.dependencies.dependencies,
                 "dependencies_services_treeview",
                 "dependencies_nodeset_treeview",
-                "dependencies_dependencies_treeview")
+                "dependencies_dependencies_treeview",
+                "dependencies_services_entry", "dependencies_nodeset_entry",
+                "dependencies_dependencies_entry",
+                (str, NodeSet.NodeSet, str))
+        self.nodes = TabManagers.NodesTabManager(self.interface,
+                self.config.nodes.nodes, "nodes_treeview", "nodes_edit_entry",
+                (str, Node.Node))
 
         self.all_treeview_init()
         self.all_liststores_init()
@@ -164,8 +172,16 @@ class Hello:
         self.services.del_selected()
         self.services.update()
 
+    def on_services_add(self, button):
+        self.services.add()
+        self.services.update()
+
     def on_service_delete(self, button):
         self.services.del_selected_props()
+        self.services.update_props()
+
+    def on_service_add(self, button):
+        self.services.add_props()
         self.services.update_props()
 
     def on_groups_treeview_cursor_changed(self, treeview):
@@ -175,12 +191,27 @@ class Hello:
         self.groups.del_selected()
         self.groups.update()
 
+    def on_groups_add(self, button):
+        self.groups.add()
+        self.groups.update()
+
     def on_group_delete(self, button):
         self.groups.del_selected_props()
         self.groups.update_props()
 
+    def on_group_add(self, button):
+        self.groups.add_props()
+        self.groups.update_props()
+
+    def on_nodes_treeview_cursor_changed(self, treeview):
+        self.nodes.update_props()
+
     def on_nodes_delete(self, button):
         self.nodes.del_selected()
+        self.nodes.update()
+
+    def on_nodes_add(self, button):
+        self.nodes.add()
         self.nodes.update()
 
     def on_dependencies_services_treeview_cursor_changed(self, treeview):
@@ -190,8 +221,16 @@ class Hello:
         self.dependencies.del_selected()
         self.dependencies.update()
 
+    def on_dependencies_services_add(self, button):
+        self.dependencies.add()
+        self.dependencies.update()
+
     def on_dependencies_nodeset_treeview_cursor_changed(self, treeview):
         self.dependencies.update_secProps()
+
+    def on_dependencies_nodeset_add(self, button):
+        self.dependencies.add_props()
+        self.dependencies.update_props()
 
     def on_dependencies_nodeset_delete(self, button):
         self.dependencies.del_selected_props()
@@ -199,6 +238,10 @@ class Hello:
 
     def on_dependencies_dependencies_delete(self, button):
         self.dependencies.del_selected_secProps()
+        self.dependencies.update_secProps()
+
+    def on_dependencies_dependencies_add(self, button):
+        self.dependencies.add_secProps()
         self.dependencies.update_secProps()
 
 if __name__ == "__main__":

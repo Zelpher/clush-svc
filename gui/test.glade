@@ -113,6 +113,7 @@
                         <child>
                           <object class="GtkRadioButton" id="command_radio_nodeset_radiobutton">
                             <property name="label" translatable="yes">NodeSet</property>
+                            <property name="use_action_appearance">False</property>
                             <property name="visible">True</property>
                             <property name="can_focus">True</property>
                             <property name="receives_default">False</property>
@@ -129,6 +130,7 @@
                         <child>
                           <object class="GtkRadioButton" id="command_radio_group_radiobutton">
                             <property name="label" translatable="yes">Group</property>
+                            <property name="use_action_appearance">False</property>
                             <property name="visible">True</property>
                             <property name="can_focus">True</property>
                             <property name="receives_default">False</property>
@@ -261,6 +263,7 @@
                         <child>
                           <object class="GtkButton" id="command_exec_button">
                             <property name="label">gtk-execute</property>
+                            <property name="use_action_appearance">False</property>
                             <property name="visible">True</property>
                             <property name="can_focus">True</property>
                             <property name="receives_default">True</property>
@@ -364,6 +367,7 @@
                                 <property name="secondary_icon_activatable">False</property>
                                 <property name="primary_icon_sensitive">True</property>
                                 <property name="secondary_icon_sensitive">True</property>
+                                <signal name="activate" handler="on_groups_add" swapped="no"/>
                               </object>
                             </child>
                             <child type="label">
@@ -389,9 +393,11 @@
                             <property name="shadow_type">none</property>
                             <child>
                               <object class="GtkButton" id="groups_add_button">
+                                <property name="use_action_appearance">False</property>
                                 <property name="visible">True</property>
                                 <property name="can_focus">True</property>
                                 <property name="receives_default">True</property>
+                                <signal name="released" handler="on_groups_add" swapped="no"/>
                                 <child>
                                   <object class="GtkImage" id="groups_add_image">
                                     <property name="visible">True</property>
@@ -423,6 +429,7 @@
                             <property name="shadow_type">none</property>
                             <child>
                               <object class="GtkButton" id="groups_delete_button">
+                                <property name="use_action_appearance">False</property>
                                 <property name="visible">True</property>
                                 <property name="can_focus">True</property>
                                 <property name="receives_default">True</property>
@@ -488,6 +495,7 @@
                                 <property name="secondary_icon_activatable">False</property>
                                 <property name="primary_icon_sensitive">True</property>
                                 <property name="secondary_icon_sensitive">True</property>
+                                <signal name="activate" handler="on_group_add" swapped="no"/>
                               </object>
                             </child>
                             <child type="label">
@@ -522,6 +530,7 @@
                                 <property name="secondary_icon_activatable">False</property>
                                 <property name="primary_icon_sensitive">True</property>
                                 <property name="secondary_icon_sensitive">True</property>
+                                <signal name="activate" handler="on_group_add" swapped="no"/>
                               </object>
                             </child>
                             <child type="label">
@@ -547,9 +556,12 @@
                             <property name="shadow_type">none</property>
                             <child>
                               <object class="GtkButton" id="group_add_button">
+                                <property name="use_action_appearance">False</property>
                                 <property name="visible">True</property>
                                 <property name="can_focus">True</property>
                                 <property name="receives_default">True</property>
+                                <signal name="activate" handler="on_group_add" swapped="no"/>
+                                <signal name="released" handler="on_group_add" swapped="no"/>
                                 <child>
                                   <object class="GtkImage" id="group_add_image">
                                     <property name="visible">True</property>
@@ -581,6 +593,7 @@
                             <property name="shadow_type">none</property>
                             <child>
                               <object class="GtkButton" id="group_delete_button">
+                                <property name="use_action_appearance">False</property>
                                 <property name="visible">True</property>
                                 <property name="can_focus">True</property>
                                 <property name="receives_default">True</property>
@@ -720,6 +733,7 @@
                                 <property name="secondary_icon_activatable">False</property>
                                 <property name="primary_icon_sensitive">True</property>
                                 <property name="secondary_icon_sensitive">True</property>
+                                <signal name="activate" handler="on_services_add" swapped="no"/>
                               </object>
                             </child>
                             <child type="label">
@@ -745,9 +759,11 @@
                             <property name="shadow_type">none</property>
                             <child>
                               <object class="GtkButton" id="services_add_button">
+                                <property name="use_action_appearance">False</property>
                                 <property name="visible">True</property>
                                 <property name="can_focus">True</property>
                                 <property name="receives_default">True</property>
+                                <signal name="released" handler="on_services_add" swapped="no"/>
                                 <child>
                                   <object class="GtkImage" id="services_add_image">
                                     <property name="visible">True</property>
@@ -780,6 +796,7 @@
                             <property name="shadow_type">none</property>
                             <child>
                               <object class="GtkButton" id="services_delete_button">
+                                <property name="use_action_appearance">False</property>
                                 <property name="visible">True</property>
                                 <property name="can_focus">True</property>
                                 <property name="receives_default">True</property>
@@ -868,6 +885,7 @@
                                 <property name="secondary_icon_activatable">False</property>
                                 <property name="primary_icon_sensitive">True</property>
                                 <property name="secondary_icon_sensitive">True</property>
+                                <signal name="activate" handler="on_service_add" swapped="no"/>
                               </object>
                             </child>
                             <child type="label">
@@ -902,6 +920,7 @@
                                 <property name="secondary_icon_activatable">False</property>
                                 <property name="primary_icon_sensitive">True</property>
                                 <property name="secondary_icon_sensitive">True</property>
+                                <signal name="activate" handler="on_service_add" swapped="no"/>
                               </object>
                             </child>
                             <child type="label">
@@ -927,9 +946,11 @@
                             <property name="shadow_type">none</property>
                             <child>
                               <object class="GtkButton" id="service_add_button">
+                                <property name="use_action_appearance">False</property>
                                 <property name="visible">True</property>
                                 <property name="can_focus">True</property>
                                 <property name="receives_default">True</property>
+                                <signal name="released" handler="on_service_add" swapped="no"/>
                                 <child>
                                   <object class="GtkImage" id="service_add_image">
                                     <property name="visible">True</property>
@@ -962,6 +983,7 @@
                             <property name="shadow_type">none</property>
                             <child>
                               <object class="GtkButton" id="service_delete_button">
+                                <property name="use_action_appearance">False</property>
                                 <property name="visible">True</property>
                                 <property name="can_focus">True</property>
                                 <property name="receives_default">True</property>
@@ -1057,6 +1079,7 @@
                                 <property name="secondary_icon_activatable">False</property>
                                 <property name="primary_icon_sensitive">True</property>
                                 <property name="secondary_icon_sensitive">True</property>
+                                <signal name="activate" handler="on_dependencies_services_add" swapped="no"/>
                               </object>
                             </child>
                             <child type="label">
@@ -1082,9 +1105,11 @@
                             <property name="shadow_type">none</property>
                             <child>
                               <object class="GtkButton" id="dependencies_services_add_button">
+                                <property name="use_action_appearance">False</property>
                                 <property name="visible">True</property>
                                 <property name="can_focus">True</property>
                                 <property name="receives_default">True</property>
+                                <signal name="released" handler="on_dependencies_services_add" swapped="no"/>
                                 <child>
                                   <object class="GtkImage" id="dependencies_services_add_image">
                                     <property name="visible">True</property>
@@ -1116,6 +1141,7 @@
                             <property name="shadow_type">none</property>
                             <child>
                               <object class="GtkButton" id="dependencies_services_delete_button">
+                                <property name="use_action_appearance">False</property>
                                 <property name="visible">True</property>
                                 <property name="can_focus">True</property>
                                 <property name="receives_default">True</property>
@@ -1181,6 +1207,7 @@
                                 <property name="secondary_icon_activatable">False</property>
                                 <property name="primary_icon_sensitive">True</property>
                                 <property name="secondary_icon_sensitive">True</property>
+                                <signal name="activate" handler="on_dependencies_nodeset_add" swapped="no"/>
                               </object>
                             </child>
                             <child type="label">
@@ -1206,9 +1233,11 @@
                             <property name="shadow_type">none</property>
                             <child>
                               <object class="GtkButton" id="dependencies_nodeset_add_button">
+                                <property name="use_action_appearance">False</property>
                                 <property name="visible">True</property>
                                 <property name="can_focus">True</property>
                                 <property name="receives_default">True</property>
+                                <signal name="released" handler="on_dependencies_nodeset_add" swapped="no"/>
                                 <child>
                                   <object class="GtkImage" id="dependencies_nodeset_add_image">
                                     <property name="visible">True</property>
@@ -1240,6 +1269,7 @@
                             <property name="shadow_type">none</property>
                             <child>
                               <object class="GtkButton" id="dependencies_nodeset_delete_button">
+                                <property name="use_action_appearance">False</property>
                                 <property name="visible">True</property>
                                 <property name="can_focus">True</property>
                                 <property name="receives_default">True</property>
@@ -1307,6 +1337,7 @@
                                 <property name="secondary_icon_activatable">False</property>
                                 <property name="primary_icon_sensitive">True</property>
                                 <property name="secondary_icon_sensitive">True</property>
+                                <signal name="activate" handler="on_dependencies_dependencies_add" swapped="no"/>
                               </object>
                             </child>
                             <child type="label">
@@ -1332,9 +1363,11 @@
                             <property name="shadow_type">none</property>
                             <child>
                               <object class="GtkButton" id="dependencies_dependencies_add_button">
+                                <property name="use_action_appearance">False</property>
                                 <property name="visible">True</property>
                                 <property name="can_focus">True</property>
                                 <property name="receives_default">True</property>
+                                <signal name="released" handler="on_dependencies_dependencies_add" swapped="no"/>
                                 <child>
                                   <object class="GtkImage" id="dependencies_dependencies_add_image">
                                     <property name="visible">True</property>
@@ -1366,6 +1399,7 @@
                             <property name="shadow_type">none</property>
                             <child>
                               <object class="GtkButton" id="dependencies_dependencies_delete_button">
+                                <property name="use_action_appearance">False</property>
                                 <property name="visible">True</property>
                                 <property name="can_focus">True</property>
                                 <property name="receives_default">True</property>
@@ -1500,6 +1534,7 @@
                             <property name="can_focus">True</property>
                             <property name="model">nodes_liststore</property>
                             <property name="headers_visible">False</property>
+                            <signal name="cursor-changed" handler="on_nodes_treeview_cursor_changed" swapped="no"/>
                           </object>
                         </child>
                       </object>
@@ -1530,6 +1565,7 @@
                                 <property name="secondary_icon_activatable">False</property>
                                 <property name="primary_icon_sensitive">True</property>
                                 <property name="secondary_icon_sensitive">True</property>
+                                <signal name="activate" handler="on_nodes_add" swapped="no"/>
                               </object>
                             </child>
                             <child type="label">
@@ -1555,9 +1591,11 @@
                             <property name="shadow_type">none</property>
                             <child>
                               <object class="GtkButton" id="nodes_add_button">
+                                <property name="use_action_appearance">False</property>
                                 <property name="visible">True</property>
                                 <property name="can_focus">True</property>
                                 <property name="receives_default">True</property>
+                                <signal name="released" handler="on_nodes_add" swapped="no"/>
                                 <child>
                                   <object class="GtkImage" id="nodes_add_image">
                                     <property name="visible">True</property>
@@ -1590,6 +1628,7 @@
                             <property name="shadow_type">none</property>
                             <child>
                               <object class="GtkButton" id="nodes_delete_button">
+                                <property name="use_action_appearance">False</property>
                                 <property name="visible">True</property>
                                 <property name="can_focus">True</property>
                                 <property name="receives_default">True</property>
@@ -1679,17 +1718,7 @@
                                 <property name="visible">True</property>
                                 <property name="can_focus">False</property>
                                 <child>
-                                  <object class="GtkComboBox" id="node_prop_manager_combobox">
-                                    <property name="height_request">25</property>
-                                    <property name="visible">True</property>
-                                    <property name="can_focus">False</property>
-                                    <property name="model">node_manager_liststore</property>
-                                  </object>
-                                  <packing>
-                                    <property name="expand">False</property>
-                                    <property name="fill">True</property>
-                                    <property name="position">0</property>
-                                  </packing>
+                                  <placeholder/>
                                 </child>
                               </object>
                               <packing>
@@ -1764,14 +1793,6 @@
       <column type="gchararray"/>
     </columns>
   </object>
-  <object class="GtkListStore" id="status_liststore">
-    <columns>
-      <!-- column-name Groups -->
-      <column type="gchararray"/>
-      <!-- column-name Status -->
-      <column type="gchararray"/>
-    </columns>
-  </object>
   <object class="GtkListStore" id="service_liststore">
     <columns>
       <!-- column-name NodeSet -->
@@ -1783,6 +1804,14 @@
   <object class="GtkListStore" id="services_liststore">
     <columns>
       <!-- column-name Service -->
+      <column type="gchararray"/>
+    </columns>
+  </object>
+  <object class="GtkListStore" id="status_liststore">
+    <columns>
+      <!-- column-name Groups -->
+      <column type="gchararray"/>
+      <!-- column-name Status -->
       <column type="gchararray"/>
     </columns>
   </object>
