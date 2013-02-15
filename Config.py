@@ -226,3 +226,12 @@ class Config:
         self.services.load()
         self.dependencies.load()
         self.groups.load()
+
+    def save(self):
+        """
+        Save config to files in ~/.config/clush-svc/
+        """
+        self.nodes.save()
+        self.services.save()
+        self.dependencies.save()
+        self.groups.save()

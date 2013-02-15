@@ -55,9 +55,6 @@ class Hello:
         self.main_tabs_widget = self.interface.get_object('main_tabs')
         self.on_main_tabs_switch_page(self.main_tabs_widget, self.main_tabs_widget.get_nth_page(0), 0)
 
-    def on_main_window_destroy(self, widget):
-        gtk.main_quit()
-
     def all_treeview_init(self):
         """
         Add columns to every treeview
@@ -88,6 +85,20 @@ class Hello:
                 col.pack_start(cell)
                 col.add_attribute(cell, "text", column)
                 col.set_resizable(True)
+
+    def all_liststores_init(self):
+        """
+        Put data from config into all base liststores
+        """
+        [ self.interface.get_object("services_liststore").append([service])
+            for service in self.config.services.services ]
+        [ self.interface.get_object("groups_liststore").append([group])
+            for group in self.config.groups.groups ]
+        [ self.interface.get_object("nodes_liststore").append([node])
+            for node in self.config.nodes.nodes ]
+        [ self.interface.get_object("dependencies_services_liststore")
+            .append([dependency])
+            for dependency in self.config.dependencies.dependencies ]
 
     def on_command_exec(self, widget):
         self.interface.get_object('command_liststore').clear()
@@ -150,20 +161,11 @@ class Hello:
                         state = "Stopped"
                 self.interface.get_object('status_liststore').append([arg_group, state])
 
+    def on_main_window_destroy(self, widget):
+        gtk.main_quit()
 
-    def all_liststores_init(self):
-        """
-        Put data from config into all base liststores
-        """
-        [ self.interface.get_object("services_liststore").append([service])
-            for service in self.config.services.services ]
-        [ self.interface.get_object("groups_liststore").append([group])
-            for group in self.config.groups.groups ]
-        [ self.interface.get_object("nodes_liststore").append([node])
-            for node in self.config.nodes.nodes ]
-        [ self.interface.get_object("dependencies_services_liststore")
-            .append([dependency])
-            for dependency in self.config.dependencies.dependencies ]
+    def on_save_button(self, button):
+        self.config.save()
 
     def on_services_treeview_cursor_changed(self, treeview):
         self.services.update_props()
