@@ -13,12 +13,108 @@ import Config
 import Node
 
 class Hello:
+    class DictTabManager:
+        def __init__(self, interface, config, dict_treeview):
+            self.config = config
+            self.interface = interface
+            self.tv = self.interface.get_object(dict_treeview)
+            self.lst = self.tv.get_model()
+        def get_last_selected(self):
+            cur = self.tv.get_cursor()[0]
+            if cur:
+                return self.lst[cur[0]][0]
+        def get_selected(self):
+            selected = self.tv.get_selection().get_selected_rows()[1]
+            return [ self.lst[element][0] for element in selected ]
+        def del_selected(self):
+            for element in self.get_selected():
+                del self.config[element]
+        def update(self):
+            self.lst.clear()
+            [ self.lst.append([element]) for element in self.config ]
+
+    class DictListTabManager(DictTabManager):
+        def __init__(self, interface, config, dict_treeview, list_treeview):
+            Hello.DictTabManager.__init__(self, interface, config, dict_treeview)
+            self.props_tv = self.interface.get_object(list_treeview)
+            self.props_lst = self.props_tv.get_model()
+        def update(self):
+            self.props_lst.clear()
+            Hello.DictTabManager.update(self)
+        def get_selected_props(self):
+            selected = [ index[0] for index in
+                    self.props_tv.get_selection().get_selected_rows()[1] ]
+            selected.sort(); selected.reverse()
+            element = self.get_last_selected()
+            props = self.config[element].keys()
+            return [ props[index] for index in selected ]
+        def del_selected_props(self):
+            element = self.get_last_selected()
+            for props in self.get_selected_props():
+                del self.config[element][props]
+        def update_props(self):
+            element = self.get_last_selected()
+            self.props_lst.clear()
+            [ self.props_lst.append(data) for data in
+                    self.config[element].items() ]
+
+    class DictListListTabManager(DictListTabManager):
+        def __init__(self, interface, config, dict_treeview, list1_treeview,
+                list2_treeview):
+            Hello.DictListTabManager.__init__(self, interface, config,
+                    dict_treeview, list1_treeview)
+            self.secProps_tv = self.interface.get_object(list2_treeview)
+            self.secProps_lst = self.secProps_tv.get_model()
+        def update_props(self):
+            self.secProps_lst.clear()
+            element = self.get_last_selected()
+            self.props_lst.clear()
+            [ self.props_lst.append(data[:-1]) for data in
+                    self.config[element].items() ]
+        def get_last_selected_props(self):
+            element = self.get_last_selected()
+            cur = self.props_tv.get_cursor()[0]
+            if cur:
+                return self.config[element].keys()[cur[0]]
+        def get_selected_secProps(self):
+            selected = [ index[0] for index in
+                    self.secProps_tv.get_selection().get_selected_rows()[1] ]
+            selected.sort(); selected.reverse()
+            element = self.get_last_selected()
+            props = self.get_last_selected_props()
+            secProps = self.config[element][props]
+            return [ secProps[index] for index in selected ]
+        def del_selected_secProps(self):
+            element = self.get_last_selected()
+            props = self.get_last_selected_props()
+            [ self.config[element][props].remove(secProps) for secProps in
+                    self.get_selected_secProps() ]
+        def update_secProps(self):
+            element = self.get_last_selected()
+            props = self.get_last_selected_props()
+            self.secProps_lst.clear()
+            [ self.secProps_lst.append([data]) for data in
+                    [ datas for datas in self.config[element][props] ] ]
+            
     def __init__(self):
         self.config = Config.Config()
         self.interface = gtk.Builder()
 
         self.interface.add_from_file('test.glade')
         self.interface.connect_signals(self)
+
+        self.nodes = Hello.DictTabManager(self.interface,
+                self.config.nodes.nodes, "nodes_treeview")
+        self.services = Hello.DictListTabManager(self.interface,
+            self.config.services.services,
+            "services_treeview", "service_treeview")
+        self.groups = Hello.DictListTabManager(self.interface,
+            self.config.groups.groups, "groups_treeview", "group_treeview")
+        self.dependencies = Hello.DictListListTabManager(self.interface,
+                self.config.dependencies.dependencies,
+                "dependencies_services_treeview",
+                "dependencies_nodeset_treeview",
+                "dependencies_dependencies_treeview")
 
         self.all_treeview_init()
         self.all_liststores_init()
@@ -122,161 +218,49 @@ class Hello:
             .append([dependency])
             for dependency in self.config.dependencies.dependencies ]
 
-    ##########
-    # FIXME: this is a horrible mess
     def on_services_treeview_cursor_changed(self, treeview):
-        service = treeview.get_model()[treeview.get_cursor()[0]][0]
-        service_liststore = self.interface.get_object("service_liststore")
-        service_liststore.clear()
-        [ service_liststore.append([nodeset, script]) for (nodeset, script) in
-            self.config.services.services[service].items() ]
+        self.services.update_props()
 
     def on_services_delete(self, button):
-        (services, selected) = self.interface.get_object(
-            "services_treeview").get_selection().get_selected_rows()
-        for index in selected:
-            service = services[index][0]
-            del self.config.services.services[service]
-        self.interface.get_object("service_liststore").clear()
-        services.clear()
-        [ services.append([service])
-            for service in self.config.services.services ]
+        self.services.del_selected()
+        self.services.update()
 
     def on_service_delete(self, button):
-        (service, selected) = self.interface.get_object(
-                "service_treeview").get_selection().get_selected_rows()
-        if selected:
-            services = self.interface.get_object("services_treeview")
-            service_name = services.get_model()[services.get_cursor()[0]][0]
-            selected = [ index[0] for index in selected ]
-            selected.sort(); selected.reverse()
-            for index in selected:
-                # we're being a bit hackish here
-                del self.config.services.services[service_name][
-                        self.config.services.services[
-                        service_name].keys()[index]]
-            service.clear()
-            self.on_services_treeview_cursor_changed(services)
+        self.services.del_selected_props()
+        self.services.update_props()
 
     def on_groups_treeview_cursor_changed(self, treeview):
-        group = treeview.get_model()[treeview.get_cursor()[0]][0]
-        group_liststore = self.interface.get_object("group_liststore")
-        group_liststore.clear()
-        [ group_liststore.append([service, nodeset]) for (service, nodeset) in
-            self.config.groups.groups[group].items() ]
+        self.groups.update_props()
 
     def on_groups_delete(self, button):
-        (groups, selected) = self.interface.get_object(
-            "groups_treeview").get_selection().get_selected_rows()
-        for index in selected:
-            group = groups[index][0]
-            del self.config.groups.groups[group]
-        self.interface.get_object("group_liststore").clear()
-        self.interface.get_object("groups_liststore").clear()
-        [ groups.append([group])
-            for group in self.config.groups.groups ]
+        self.groups.del_selected()
+        self.groups.update()
 
     def on_group_delete(self, button):
-        (group, selected) = self.interface.get_object(
-            "group_treeview").get_selection().get_selected_rows()
-        if selected:
-            groups = self.interface.get_object("groups_treeview")
-            group_name = groups.get_model()[groups.get_cursor()[0]][0]
-            selected = [ index[0] for index in selected ]
-            selected.sort(); selected.reverse()
-            for index in selected:
-                # we're being a bit hackish here
-                del self.config.groups.groups[group_name][
-                        self.config.groups.groups[
-                        group_name].keys()[index]]
-            self.interface.get_object("group_liststore").clear()
-            group.clear()
-            self.on_groups_treeview_cursor_changed(groups)
+        self.groups.del_selected_props()
+        self.groups.update_props()
 
     def on_nodes_delete(self, button):
-        (nodes, selected) = self.interface.get_object(
-                "nodes_treeview").get_selection().get_selected_rows()
-        selected = [ index[0] for index in selected ]
-        selected.sort(); selected.reverse()
-        for index in selected:
-            del self.config.nodes.nodes[
-                self.config.nodes.nodes.keys()[index]]
-        nodes.clear()
-        [ nodes.append([node]) for node in self.config.nodes.nodes ]
+        self.nodes.del_selected()
+        self.nodes.update()
 
     def on_dependencies_services_treeview_cursor_changed(self, treeview):
-        service = treeview.get_model()[treeview.get_cursor()[0]][0]
-        nodeset_liststore = self.interface.get_object(
-            "dependencies_nodeset_liststore")
-        nodeset_liststore.clear()
-        [ nodeset_liststore.append([nodeset]) for nodeset in
-            self.config.dependencies.dependencies[service] ]
-        self.interface.get_object(
-            "dependencies_dependencies_treeview").get_model().clear()
-
-    def on_dependencies_nodeset_treeview_cursor_changed(self, treeview):
-        service_tv = self.interface.get_object("dependencies_services_treeview")
-        service = service_tv.get_model()[service_tv.get_cursor()[0]][0]
-        nodeset = treeview.get_cursor()[0][0]
-        dependencies_liststore = self.interface.get_object(
-            "dependencies_dependencies_liststore")
-        dependencies_liststore.clear()
-        # we're being a bit hackish here
-        [ dependencies_liststore.append([dependency]) for dependency in
-            self.config.dependencies.dependencies[service][
-            self.config.dependencies.dependencies[service].keys()[nodeset]] ]
+        self.dependencies.update_props()
 
     def on_dependencies_services_delete(self, button):
-        (services, selected) = self.interface.get_object(
-            "dependencies_services_treeview").get_selection().get_selected_rows()
-        for index in selected:
-            service = services[index][0]
-            del self.config.dependencies.dependencies[service]
-        for liststore in ['nodeset', 'dependencies']:
-            self.interface.get_object("dependencies_%s_liststore"
-                %liststore).clear()
-        services.clear()
-        [ services.append([service])
-            for service in self.config.dependencies.dependencies ]
+        self.dependencies.del_selected()
+        self.dependencies.update()
+
+    def on_dependencies_nodeset_treeview_cursor_changed(self, treeview):
+        self.dependencies.update_secProps()
 
     def on_dependencies_nodeset_delete(self, button):
-        (nodesets, selected) = self.interface.get_object(
-            "dependencies_nodeset_treeview").get_selection().get_selected_rows()
-        if selected:
-            services = self.interface.get_object(
-                "dependencies_services_treeview")
-            service_name = services.get_model()[services.get_cursor()[0]][0]
-            selected = [ index[0] for index in selected ]
-            selected.sort(); selected.reverse()
-            # we're being a bit hackish here
-            for index in selected:
-                del self.config.dependencies.dependencies[service_name][
-                    self.config.dependencies.dependencies[service_name]
-                    .keys()[index]]
-            self.interface.get_object(
-                "dependencies_dependencies_liststore").clear()
-            nodesets.clear()
-            [ nodesets.append([nodeset]) for nodeset in
-                self.config.dependencies.dependencies[service_name] ]
+        self.dependencies.del_selected_props()
+        self.dependencies.update_props()
 
     def on_dependencies_dependencies_delete(self, button):
-        (dependencies, selected) = self.interface.get_object(
-            "dependencies_dependencies_treeview"
-            ).get_selection().get_selected_rows()
-        if selected:
-            nodesets = self.interface.get_object(
-                "dependencies_nodeset_treeview")
-            nodeset_number = nodesets.get_cursor()[0][0]
-            services = self.interface.get_object("dependencies_services_treeview")
-            service_name = services.get_model()[services.get_cursor()[0]][0]
-            for index in selected:
-                dependency = dependencies[index][0]
-                self.config.dependencies.dependencies[service_name][
-                    self.config.dependencies.dependencies[service_name]
-                    .keys()[nodeset_number]].remove(dependency)
-            dependencies.clear()
-            self.on_dependencies_nodeset_treeview_cursor_changed(nodesets)
-    ##########
+        self.dependencies.del_selected_secProps()
+        self.dependencies.update_secProps()
 
 if __name__ == "__main__":
     Hello()
