@@ -27,6 +27,19 @@ class Config:
                     self.nodes[node].name = node
                     self.nodes[node].manager = manager
 
+        def save(self):
+            conf = ConfigParser()
+            conf.add_section('Managers')
+            nodesByManager = Node.Node.group_by_manager(self.nodes.values())
+            for manager in nodesByManager:
+                nodes = NodeSet.NodeSet().fromlist([ node.name for node in
+                    nodesByManager[manager] ])
+                conf.set('Managers', str(nodes), manager)
+            cfgfile = open(os.path.expanduser(
+                '~/.config/clush-svc/nodes.cfg'), 'w')
+            conf.write(cfgfile)
+            cfgfile.close()
+
         def get_from_nodeset(self, nodeset):
             """
             Take a NodeSet and return a list of Nodes with their known
@@ -53,6 +66,18 @@ class Config:
                 for (nodeset, script) in conf.items(service):
                     nodeset = NodeSet.NodeSet(nodeset.lower())
                     self.services[service][nodeset] = script
+
+        def save(self):
+            conf = ConfigParser()
+            for service in self.services:
+                conf.add_section(service)
+                for nodeset in self.services[service]:
+                    conf.set(service, str(nodeset),
+                            self.services[service][nodeset])
+            cfgfile = open(os.path.expanduser(
+                '~/.config/clush-svc/services.cfg'), 'w')
+            conf.write(cfgfile)
+            cfgfile.close()
 
         def get_alias(self, service, node):
             """
@@ -84,6 +109,18 @@ class Config:
                     dependencies = map(str.strip, dependencies.split(','))
                     nodeset = NodeSet.NodeSet(nodeset.lower())
                     self.dependencies[service][nodeset] = dependencies
+
+        def save(self):
+            conf = ConfigParser()
+            for service in self.dependencies:
+                conf.add_section(service)
+                for nodeset in self.dependencies[service]:
+                    conf.set(service, str(nodeset),
+                            ', '.join(self.dependencies[service][nodeset]))
+            cfgfile = open(os.path.expanduser(
+                '~/.config/clush-svc/dependencies.cfg'), 'w')
+            conf.write(cfgfile)
+            cfgfile.close()
 
         def get_for_one(self, service, node):
             """
@@ -154,6 +191,17 @@ class Config:
                 for (service, nodeset) in conf.items(group):
                     nodeset = NodeSet.NodeSet(nodeset.lower())
                     self.groups[group][service] = nodeset
+
+        def save(self):
+            conf = ConfigParser()
+            for group in self.groups:
+                conf.add_section(group)
+                for service in self.groups[group]:
+                    conf.set(group, service, str(self.groups[group][service]))
+            cfgfile = open(os.path.expanduser(
+                '~/.config/clush-svc/groups.cfg'), 'w')
+            conf.write(cfgfile)
+            cfgfile.close()
 
         def get(self, group):
             """

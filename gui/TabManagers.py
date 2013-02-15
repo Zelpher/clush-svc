@@ -47,6 +47,7 @@ class NodesTabManager(DictTabManager):
         entry = self.entry.get_text().lower()
         if entry:
             self.config[entry] = Node.Node()
+            self.config[entry].name = entry
             self.entry.set_text('')
             self.update()
     def update_props(self):
@@ -88,7 +89,6 @@ class DictDictTabManager(DictTabManager):
         element = self.get_last_selected()
         prop1 = self.prop1_entry.get_text().lower()
         prop2 = self.prop2_entry.get_text().lower()
-        print prop1
         if prop1 and prop2 and element:
             prop1 = self.entryTypes[1](prop1)
             prop2 = self.entryTypes[2](prop2)
