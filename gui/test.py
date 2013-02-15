@@ -27,8 +27,11 @@ class Hello:
         self.interface.get_object('command_radio_nodeset_radiobutton').set_active(True)
 
         self.command = ClushSvcCLI.ClushSvcCLI()
-        self.command.config = Config.Config()
+        self.command.config = self.config
 
+        # First status check on launch
+        self.main_tabs_widget = self.interface.get_object('main_tabs')
+        self.on_main_tabs_switch_page(self.main_tabs_widget, self.main_tabs_widget.get_nth_page(0), 0)
 
     def on_main_window_destroy(self, widget):
         gtk.main_quit()
@@ -39,7 +42,7 @@ class Hello:
         """
         cell = gtk.CellRendererText()
         treeviews = {
-            'status_treeview': ['NodeSet', 'Service', 'Status'],
+            'status_treeview': ['Groups', 'Status'],
             'command_treeview': ['NodeSet', 'Service', 'Status'],
             'services_treeview': ['Service'],
             'service_treeview': ['NodeSet', 'Alias'],
@@ -107,6 +110,24 @@ class Hello:
         else:
             self.interface.get_object('command_service_frame').show_all()
         self.command_target_switch = not self.command_target_switch
+
+    def on_main_tabs_switch_page(self, widget, page, page_num):
+        if (page_num == 0):
+            self.interface.get_object('status_liststore').clear()
+            for arg_group in self.command.config.groups.groups:
+                state = "Running"
+                arg_task = self.command.config.groups.get(arg_group.lower())
+                for service in arg_task:
+                    arg_task[service] = set(self.command.config.nodes.get_from_nodeset(
+                        arg_task[service]))
+                dependencies = self.command.config.dependencies.get_recursive(arg_task)
+                dependencies.append(arg_task)
+                self.command.dependencies_run(dependencies, 'status')
+                for (nodes, script, status) in self.command.result:
+                    if (status == "failed"):
+                        state = "Stopped"
+                self.interface.get_object('status_liststore').append([arg_group, state])
+
 
     def all_liststores_init(self):
         """

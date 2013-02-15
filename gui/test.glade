@@ -61,6 +61,7 @@
       <object class="GtkNotebook" id="main_tabs">
         <property name="visible">True</property>
         <property name="can_focus">True</property>
+        <signal name="switch-page" handler="on_main_tabs_switch_page" after="yes" swapped="no"/>
         <child>
           <object class="GtkScrolledWindow" id="status_scrolledwindow">
             <property name="visible">True</property>
@@ -112,7 +113,6 @@
                         <child>
                           <object class="GtkRadioButton" id="command_radio_nodeset_radiobutton">
                             <property name="label" translatable="yes">NodeSet</property>
-                            <property name="use_action_appearance">False</property>
                             <property name="visible">True</property>
                             <property name="can_focus">True</property>
                             <property name="receives_default">False</property>
@@ -129,7 +129,6 @@
                         <child>
                           <object class="GtkRadioButton" id="command_radio_group_radiobutton">
                             <property name="label" translatable="yes">Group</property>
-                            <property name="use_action_appearance">False</property>
                             <property name="visible">True</property>
                             <property name="can_focus">True</property>
                             <property name="receives_default">False</property>
@@ -262,7 +261,6 @@
                         <child>
                           <object class="GtkButton" id="command_exec_button">
                             <property name="label">gtk-execute</property>
-                            <property name="use_action_appearance">False</property>
                             <property name="visible">True</property>
                             <property name="can_focus">True</property>
                             <property name="receives_default">True</property>
@@ -391,7 +389,6 @@
                             <property name="shadow_type">none</property>
                             <child>
                               <object class="GtkButton" id="groups_add_button">
-                                <property name="use_action_appearance">False</property>
                                 <property name="visible">True</property>
                                 <property name="can_focus">True</property>
                                 <property name="receives_default">True</property>
@@ -426,7 +423,6 @@
                             <property name="shadow_type">none</property>
                             <child>
                               <object class="GtkButton" id="groups_delete_button">
-                                <property name="use_action_appearance">False</property>
                                 <property name="visible">True</property>
                                 <property name="can_focus">True</property>
                                 <property name="receives_default">True</property>
@@ -551,7 +547,6 @@
                             <property name="shadow_type">none</property>
                             <child>
                               <object class="GtkButton" id="group_add_button">
-                                <property name="use_action_appearance">False</property>
                                 <property name="visible">True</property>
                                 <property name="can_focus">True</property>
                                 <property name="receives_default">True</property>
@@ -586,7 +581,6 @@
                             <property name="shadow_type">none</property>
                             <child>
                               <object class="GtkButton" id="group_delete_button">
-                                <property name="use_action_appearance">False</property>
                                 <property name="visible">True</property>
                                 <property name="can_focus">True</property>
                                 <property name="receives_default">True</property>
@@ -751,7 +745,6 @@
                             <property name="shadow_type">none</property>
                             <child>
                               <object class="GtkButton" id="services_add_button">
-                                <property name="use_action_appearance">False</property>
                                 <property name="visible">True</property>
                                 <property name="can_focus">True</property>
                                 <property name="receives_default">True</property>
@@ -787,7 +780,6 @@
                             <property name="shadow_type">none</property>
                             <child>
                               <object class="GtkButton" id="services_delete_button">
-                                <property name="use_action_appearance">False</property>
                                 <property name="visible">True</property>
                                 <property name="can_focus">True</property>
                                 <property name="receives_default">True</property>
@@ -935,7 +927,6 @@
                             <property name="shadow_type">none</property>
                             <child>
                               <object class="GtkButton" id="service_add_button">
-                                <property name="use_action_appearance">False</property>
                                 <property name="visible">True</property>
                                 <property name="can_focus">True</property>
                                 <property name="receives_default">True</property>
@@ -971,7 +962,6 @@
                             <property name="shadow_type">none</property>
                             <child>
                               <object class="GtkButton" id="service_delete_button">
-                                <property name="use_action_appearance">False</property>
                                 <property name="visible">True</property>
                                 <property name="can_focus">True</property>
                                 <property name="receives_default">True</property>
@@ -1092,7 +1082,6 @@
                             <property name="shadow_type">none</property>
                             <child>
                               <object class="GtkButton" id="dependencies_services_add_button">
-                                <property name="use_action_appearance">False</property>
                                 <property name="visible">True</property>
                                 <property name="can_focus">True</property>
                                 <property name="receives_default">True</property>
@@ -1127,7 +1116,6 @@
                             <property name="shadow_type">none</property>
                             <child>
                               <object class="GtkButton" id="dependencies_services_delete_button">
-                                <property name="use_action_appearance">False</property>
                                 <property name="visible">True</property>
                                 <property name="can_focus">True</property>
                                 <property name="receives_default">True</property>
@@ -1218,7 +1206,6 @@
                             <property name="shadow_type">none</property>
                             <child>
                               <object class="GtkButton" id="dependencies_nodeset_add_button">
-                                <property name="use_action_appearance">False</property>
                                 <property name="visible">True</property>
                                 <property name="can_focus">True</property>
                                 <property name="receives_default">True</property>
@@ -1253,7 +1240,6 @@
                             <property name="shadow_type">none</property>
                             <child>
                               <object class="GtkButton" id="dependencies_nodeset_delete_button">
-                                <property name="use_action_appearance">False</property>
                                 <property name="visible">True</property>
                                 <property name="can_focus">True</property>
                                 <property name="receives_default">True</property>
@@ -1346,7 +1332,6 @@
                             <property name="shadow_type">none</property>
                             <child>
                               <object class="GtkButton" id="dependencies_dependencies_add_button">
-                                <property name="use_action_appearance">False</property>
                                 <property name="visible">True</property>
                                 <property name="can_focus">True</property>
                                 <property name="receives_default">True</property>
@@ -1381,7 +1366,6 @@
                             <property name="shadow_type">none</property>
                             <child>
                               <object class="GtkButton" id="dependencies_dependencies_delete_button">
-                                <property name="use_action_appearance">False</property>
                                 <property name="visible">True</property>
                                 <property name="can_focus">True</property>
                                 <property name="receives_default">True</property>
@@ -1571,7 +1555,6 @@
                             <property name="shadow_type">none</property>
                             <child>
                               <object class="GtkButton" id="nodes_add_button">
-                                <property name="use_action_appearance">False</property>
                                 <property name="visible">True</property>
                                 <property name="can_focus">True</property>
                                 <property name="receives_default">True</property>
@@ -1607,7 +1590,6 @@
                             <property name="shadow_type">none</property>
                             <child>
                               <object class="GtkButton" id="nodes_delete_button">
-                                <property name="use_action_appearance">False</property>
                                 <property name="visible">True</property>
                                 <property name="can_focus">True</property>
                                 <property name="receives_default">True</property>
@@ -1782,6 +1764,14 @@
       <column type="gchararray"/>
     </columns>
   </object>
+  <object class="GtkListStore" id="status_liststore">
+    <columns>
+      <!-- column-name Groups -->
+      <column type="gchararray"/>
+      <!-- column-name Status -->
+      <column type="gchararray"/>
+    </columns>
+  </object>
   <object class="GtkListStore" id="service_liststore">
     <columns>
       <!-- column-name NodeSet -->
@@ -1793,16 +1783,6 @@
   <object class="GtkListStore" id="services_liststore">
     <columns>
       <!-- column-name Service -->
-      <column type="gchararray"/>
-    </columns>
-  </object>
-  <object class="GtkListStore" id="status_liststore">
-    <columns>
-      <!-- column-name NodeSet -->
-      <column type="gchararray"/>
-      <!-- column-name Service -->
-      <column type="gchararray"/>
-      <!-- column-name Status -->
       <column type="gchararray"/>
     </columns>
   </object>
